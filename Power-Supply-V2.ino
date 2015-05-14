@@ -3,11 +3,14 @@
  */
 #include <LiquidCrystal.h>
 #include <StandardCplusplus.h>
+
 #include <serstream>
 #include <string>
 #include <vector>
 #include <iterator>
 #include <iostream>
+#include <algorithm>
+
 #include "LcdDisplay.h"
 #include "VoltageMeasure.h"
 

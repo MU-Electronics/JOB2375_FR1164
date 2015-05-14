@@ -1,3 +1,5 @@
+
+
 #pragma once
 class VoltageMeasure
 {
@@ -8,13 +10,14 @@ class VoltageMeasure
 		int SPICLOCK_PIN;
 	private:
 		int external(int channel);
-		bool average(int input, int value);
+		int internal(int channel);
+		bool average(int channel, int value);
 		float digitalToVoltage(int value);
-		int acquire(int input, int type);
+		int acquire(int channel, int type);
 	public:
-		VoltageMeasure(void);
+		VoltageMeasure();
 		~VoltageMeasure(void);
-		int get(int input, int type);
+		int get(int channel, int type);
 		
 		
 	

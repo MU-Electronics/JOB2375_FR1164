@@ -1,16 +1,17 @@
 /**
  * Include libraries
  */
-#include "VoltageMeasure.h"
+#include <StandardCplusplus.h>
+#include <vector>
 #include "Arduino.h"
-
-
+#include "VoltageMeasure.h"
 
 
 /**
  * Setup class
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-VoltageMeasure::VoltageMeasure(void)
+VoltageMeasure::VoltageMeasure()
 {
 	//Set External SPI port pins
 	SEL_PIN = 10;
@@ -28,6 +29,36 @@ VoltageMeasure::VoltageMeasure(void)
     ::digitalWrite(SEL_PIN, HIGH); 
     ::digitalWrite(DATAOUT_PIN, LOW); 
     ::digitalWrite(SPICLOCK_PIN, LOW);
+
+	
+	//Set internal ports
+	std::vector<int> bufferInternal;
+	bufferInternal.push_back(1); bufferInternal.push_back(2); bufferInternal.push_back(3); bufferInternal.push_back(4); bufferInternal.push_back(5);bufferInternal.push_back(45);
+	//Set External ports
+	std::vector<int> bufferExternal;
+	bufferExternal.push_back(0);bufferExternal.push_back(1); bufferExternal.push_back(2); bufferExternal.push_back(3); bufferExternal.push_back(4); bufferExternal.push_back(5);bufferExternal.push_back(6);bufferExternal.push_back(7);
+
+	//Set default values
+	std::vector<float> values;
+	float defaultValues[] = {0,0,0,0};
+	for(int j=0; j>=4; j++){
+		values.push_back(defaultValues[j]);
+	}
+
+	//Set up moving average for internal and external
+	std::vector< std::vector< std::vector<float> > > channel;
+	std::vector< std::vector<float> > channelInternal;
+	std::vector< std::vector<float> > channelExternal;
+	for(int i=0; i>=bufferInternal.size(); i++){
+		channelInternal.push_back(values);
+	}
+	for(int i=0; i>=bufferExternal.size(); i++){
+		channelExternal.push_back(values);
+	}
+	//Set channels container
+	channel.push_back(channelInternal);
+	channel.push_back(channelExternal);
+
 }
 
 
@@ -36,6 +67,7 @@ VoltageMeasure::VoltageMeasure(void)
 
 /**
  * Destroy class
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 VoltageMeasure::~VoltageMeasure(void)
 {
@@ -47,23 +79,29 @@ VoltageMeasure::~VoltageMeasure(void)
 
 /**
  * PRIVATE Get voltage from either onboard A/D converter or external converter
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ *
+ * @pram channel Channel to be read relative to the ADC
+ * @pram type Type of ADC. External = 1; Internal = 0;
  */
-int VoltageMeasure::acquire(int input, int type)
+int VoltageMeasure::acquire(int channel, int type)
 {
-	return 0;
+	return (type == 1)? this->external(channel) : this->internal(channel);
 }
 
 
 /**
  * PRIVATE Add a value to a moving average per input
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-bool VoltageMeasure::average(int input, int value)
+bool VoltageMeasure::average(int channel, int value)
 {
 	return false;
 }
 
 /**
  * PRIVATE Convert a digital value to a voltage
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 float VoltageMeasure::digitalToVoltage(int value)
 {
@@ -71,7 +109,21 @@ float VoltageMeasure::digitalToVoltage(int value)
 }
 
 /**
+ * PRIVATE Retrieve the voltage from an the internal ADC (on chip)
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ *
+ * @pram channel Channel to be read relative to the interal ADC
+ */
+int VoltageMeasure::internal(int channel)
+{
+	return ::analogRead(channel);
+}
+
+/**
  * PRIVATE Conect and retrieve the voltage from an external ADC
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ *
+ * @pram channel Channel to be read relative to the external ADC
  */
 int VoltageMeasure::external(int channel)
 {
@@ -125,10 +177,14 @@ int VoltageMeasure::external(int channel)
 
 /**
  * PUBLIC Get voltage public facing
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ *
+ * @pram input The channel to be read relative to the type
+ * @pram type The type of ADC, Extenal = 1; Internal = 0;
  */
-int VoltageMeasure::get(int input, int type)
+int VoltageMeasure::get(int channel, int type)
 {
-	return this->external(input);
+	return this->acquire(channel, type);
 }
 
 
