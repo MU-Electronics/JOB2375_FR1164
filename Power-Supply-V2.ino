@@ -9,7 +9,7 @@
 #include <iterator>
 #include <iostream>
 #include "LcdDisplay.h"
-
+#include "VoltageMeasure.h"
 
 
 
@@ -18,6 +18,7 @@
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 LcdDisplay* Lcd = new LcdDisplay();
+VoltageMeasure* Voltages = new VoltageMeasure();
 
 
 
@@ -34,14 +35,16 @@ void setup()
 
 
 
+
+
+
 /**
  * Run general loop
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 void loop()
 {
-	String test = "100";
-	Lcd->show("VA:"+test+"V ", 0);
+	/*Lcd->show("VA: 1V ", 0);
 	Lcd->show("VB:100.7V ", 1);
 	Lcd->show("VD:100.7V ", 2);
 	Lcd->show("VE:100.7V ", 3);
@@ -56,9 +59,21 @@ void loop()
 	
 	Lcd->show("HV ON ", 12);
 	Lcd->show("+MODE ", 13);
-	Lcd->show("|| ERROR PLUGS POLARITY", 14);
+	//Lcd->show("|| ERROR PLUGS POLARITY", 14);
 
-	delay(4000); 
-	Lcd->show("VM:500.7V ", 11);
-	delay(4000); 
+	delay(4000); */
+	
+	
+	//String Volt = "1";
+	
+
+	
+
+	for (int i=0; i<=7; i++){
+		Serial.println(i);
+		String thisString = String(Voltages->get(i, 1));
+		Lcd->show("read: "+thisString, i);
+	}
+
+	delay(200); 
 }

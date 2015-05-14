@@ -119,9 +119,15 @@ bool LcdDisplay::print(String string, int block)
 {
 	// Print string to LCD
 	if(block <= 7) {
+		// If block less than 10 clear blocks previous content
+		if(string.length() < 10) { this->clearBlock(block); }
 		// Printing to LCD 1
 		this->lcd[1]->print(string);
-	}else{
+	}
+	else
+	{
+		// If block less than 10 clear blocks previous content
+		if(string.length() < 10) { this->clearBlock(block); }
 		// Printing to LCD 2
 		this->lcd[2]->print(string);
 	}
@@ -156,5 +162,37 @@ bool LcdDisplay::show(String toShow, int block)
 	return false;
 }
 
+/**
+ * PUBLIC Clear a block of its content
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ */
+bool LcdDisplay::clearBlock(int block)
+{
+	// Set curser to block
+	this->setBlock(block);
+
+	// Find the number of sqaures to clear
+	int toClear;
+	if(block == 15)
+	{
+		toClear = this->BLOCK_COLS[block] - 40;
+	}
+	else
+	{
+		toClear = this->BLOCK_COLS[block + 1] - this->BLOCK_COLS[block];
+	}
+
+	// Clear the number of squares
+	String spaces;
+	for (int i=toClear; i>0; i--){
+		spaces = spaces + " ";
+	}
+
+	// Clear blocks
+	if(block <= 7) { this->lcd[1]->print(spaces); }else{ this->lcd[2]->print(spaces); }
+
+	// Set curser to block
+	this->setBlock(block);
+}
 
 

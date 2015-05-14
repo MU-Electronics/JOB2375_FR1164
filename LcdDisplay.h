@@ -29,6 +29,7 @@ class LcdDisplay
 		int BLOCK_COLS[16];
 		LiquidCrystal* lcd[2];
 		bool show(String toShow, int block);
+		bool clearBlock(int block);
 	
 };
 
