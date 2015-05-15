@@ -14,7 +14,7 @@
  * Setup class
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)//: channel_container()
+VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)
 {
 	//Set External SPI port pins
 	SEL_PIN = 10;
@@ -35,7 +35,7 @@ VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector
 
 
 	// Define the number of samples
-	MOVING_AVERAGE_SAMPLES = 10;
+	MOVING_AVERAGE_SAMPLES = 12;
 	// Below sets ups the moving average array
 	std::map< int, std::map<int, float> >  channelInternal;
 	std::map< int, std::map<int, float> >  channelExternal;
@@ -81,10 +81,12 @@ VoltageMeasure::~VoltageMeasure(void)
  *
  * @pram channel Channel to be read relative to the ADC
  * @pram type Type of ADC. External = 1; Internal = 0;
+ * @pram newValue Take a new value and re caculate the moving average or take just the current value
  */
-int VoltageMeasure::acquire(int channel, int type)
+int VoltageMeasure::acquire(int channel, int type, bool newValue)
 {
-	float voltage = (type == 1)? this->average(channel, 2, this->external(channel)) : this->average(channel, 1,  this->internal(channel));
+	//Get the average voltage
+	float voltage = (type == 1)? this->average(channel, 2, this->external(channel), newValue) : this->average(channel, 1,  this->internal(channel), newValue);
 
 	//We'll change to interger for now
 	return (voltage >= 0)?  (int) (voltage + 0.5) : (int) (voltage - 0.5);
@@ -95,7 +97,7 @@ int VoltageMeasure::acquire(int channel, int type)
  * PRIVATE Add a value to a moving average per input
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-float VoltageMeasure::average(int channel, int type, int value)
+float VoltageMeasure::average(int channel, int type, int value, bool newValue)
 {
 	// channel_container[ internal or external ][ channel id ][ sample id ]
 	// For Example      channel_container[1][1][1] = float(5);        ::Serial.print(channel_container[1][1][1]);
@@ -105,7 +107,13 @@ float VoltageMeasure::average(int channel, int type, int value)
 	for(int i=MOVING_AVERAGE_SAMPLES; i>=1; i--)
 	{
 		// Circular Buffer
-		if(i == 1){ channel_container[type][channel][i] = float(value); }else{ channel_container[type][channel][i] = channel_container[type][channel][i-1];} 
+		if(newValue){
+			if(i == 1){ channel_container[type][channel][i] = float(value); }else{ channel_container[type][channel][i] = channel_container[type][channel][i-1];} 
+		}else{
+			if(channel_container[type][channel][MOVING_AVERAGE_SAMPLES] == NULL) {
+				if(i == 1){ channel_container[type][channel][i] = float(value); }else{ channel_container[type][channel][i] = channel_container[type][channel][i-1];} 
+			}
+		}
 		
 		//Add total 
 		total = total + channel_container[type][channel][i];
@@ -198,10 +206,27 @@ int VoltageMeasure::external(int channel)
  * @pram input The channel to be read relative to the type
  * @pram type The type of ADC, Extenal = 1; Internal = 0;
  */
-int VoltageMeasure::get(int channel, int type)
+int VoltageMeasure::get(int channel, int type, bool refresh = true)
 {
-	return this->acquire(channel, type);
+	return this->acquire(channel, type, refresh);
 }
 
+/**
+ * PUBLIC Update all voltages moving averages
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ */
+bool VoltageMeasure::update(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)
+{
+	// Update internal channel's moving average values
+	for(int i=0; i>=averageChannelsInt.size(); i++){
+		// Create channel witn values		
+		this->get(averageChannelsInt[i], 0, true);
+	}
 
+	// Update external channel's moving average values
+	for(int i=0; i>=averageChannelsExt.size(); i++){
+		// Create channel witn values		
+		this->get(averageChannelsExt[i], 1, true);
+	}
+}
 
