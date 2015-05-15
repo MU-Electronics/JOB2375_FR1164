@@ -34,13 +34,13 @@ VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector
     ::digitalWrite(SPICLOCK_PIN, LOW);
 
 
+	// Define the number of samples
+	MOVING_AVERAGE_SAMPLES = 10;
 	// Below sets ups the moving average array
-	// @todo move the moving average to a seperate class
-	//std::vector< std::map< int, std::vector<float> > >* channel_container;
-	std::map< int, std::vector<float> >  channelInternal;
-	std::map< int, std::vector<float> >  channelExternal;
+	std::map< int, std::map<int, float> >  channelInternal;
+	std::map< int, std::map<int, float> >  channelExternal;
 	// Create default values
-	std::vector<float> values(4, float(1));
+	std::map<int, float> values;
 
 	// Created INTERNAL channels
 	for(int i=0; i>=averageChannelsInt.size(); i++){
@@ -55,10 +55,8 @@ VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector
 	}
 
 	//Push channels types onto channel container
-	channel_container->push_back(channelInternal);
-	channel_container->push_back(channelExternal);
-
-	
+	channel_container[0] = channelInternal;
+	channel_container[1] = channelExternal;
 }
 
 
@@ -86,7 +84,10 @@ VoltageMeasure::~VoltageMeasure(void)
  */
 int VoltageMeasure::acquire(int channel, int type)
 {
-	return (type == 1)? this->average(channel, 1, this->external(channel)) : this->average(channel, 1,  this->internal(channel));
+	float voltage = (type == 1)? this->average(channel, 2, this->external(channel)) : this->average(channel, 1,  this->internal(channel));
+
+	//We'll change to interger for now
+	return (voltage >= 0)?  (int) (voltage + 0.5) : (int) (voltage - 0.5);
 }
 
 
@@ -96,33 +97,22 @@ int VoltageMeasure::acquire(int channel, int type)
  */
 float VoltageMeasure::average(int channel, int type, int value)
 {
-	if(type == 1)
+	// channel_container[ internal or external ][ channel id ][ sample id ]
+	// For Example      channel_container[1][1][1] = float(5);        ::Serial.print(channel_container[1][1][1]);
+
+	//Start the moving average
+	float total = 0;
+	for(int i=MOVING_AVERAGE_SAMPLES; i>=1; i--)
 	{
-		// Set a value
+		// Circular Buffer
+		if(i == 1){ channel_container[type][channel][i] = float(value); }else{ channel_container[type][channel][i] = channel_container[type][channel][i-1];} 
 		
-		//this->channel_container[1];
-
-		//channel_container[1].find(1)->second.assign(myints,myints+4);
-
-		//std::vector<float> test2 = channel_container[1].find(1)->second;
-		//float value = test[1];
-
-		// Serial print value
-		
-		//::Serial.print("hellow");
-		//::Serial.print(test2[1]);
-
-		// Re call values
-		//std::vector<float> test2 = channel_container[1].find(1)->second;
-
-		return value;
+		//Add total 
+		total = total + channel_container[type][channel][i];
 	}
-	else if(type == 0)
-	{
-		return value;
-	}
-	
-	return value;
+
+	//Return total divided by number of samples
+	return ( total / MOVING_AVERAGE_SAMPLES );
 }
 
 /**

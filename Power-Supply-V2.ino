@@ -93,14 +93,7 @@ void loop()
 	Lcd->show("HV ON ", 12);
 	Lcd->show("+MODE ", 13);
 	//Lcd->show("|| ERROR PLUGS POLARITY", 14);
-
-	delay(4000); */
-	
-	
-	//String Volt = "1";
-	
-
-	Serial.println("hellow");
+	*/
 
 	for (int i=0; i<averageChannelsExt.size(); i++){
 		//Serial.println(averageChannelsExt[i]);
