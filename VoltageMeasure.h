@@ -1,4 +1,4 @@
-
+#include <vector>
 
 #pragma once
 class VoltageMeasure
@@ -15,7 +15,7 @@ class VoltageMeasure
 		float digitalToVoltage(int value);
 		int acquire(int channel, int type);
 	public:
-		VoltageMeasure();
+		VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt);
 		~VoltageMeasure(void);
 		int get(int channel, int type);
 		

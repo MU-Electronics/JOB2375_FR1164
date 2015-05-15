@@ -19,7 +19,7 @@
 #define F_CPU 16000000L
 #define __cplusplus
 #define ARDUINO_ARCH_AVR
-#define ARDUINO_AVR_MEGA2560
+#define ARDUINO_AVR_YUN
 #define __inline__
 #define __asm__(x)
 #define __extension__

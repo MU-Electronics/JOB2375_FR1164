@@ -15,13 +15,19 @@
 #include "VoltageMeasure.h"
 
 
+int internalADC[] = {1,2,3,4,5}; 
+std::vector<int> averageChannelsInt(internalADC, internalADC + 5);
+
+int externalADC[] = {1,2,3,4,5,4,5,6,7,8}; 
+std::vector<int> averageChannelsExt(externalADC, externalADC + 8);
+
 
 /**
  * Init singleton classes
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 LcdDisplay* Lcd = new LcdDisplay();
-VoltageMeasure* Voltages = new VoltageMeasure();
+VoltageMeasure* Voltages = new VoltageMeasure(averageChannelsInt, averageChannelsExt);
 
 
 

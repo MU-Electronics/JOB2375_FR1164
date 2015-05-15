@@ -3,6 +3,7 @@
  */
 #include <StandardCplusplus.h>
 #include <vector>
+#include <list>
 #include "Arduino.h"
 #include "VoltageMeasure.h"
 
@@ -11,7 +12,7 @@
  * Setup class
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-VoltageMeasure::VoltageMeasure()
+VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)
 {
 	//Set External SPI port pins
 	SEL_PIN = 10;
@@ -30,35 +31,37 @@ VoltageMeasure::VoltageMeasure()
     ::digitalWrite(DATAOUT_PIN, LOW); 
     ::digitalWrite(SPICLOCK_PIN, LOW);
 
-	
-	//Set internal ports
-	std::vector<int> bufferInternal;
-	bufferInternal.push_back(1); bufferInternal.push_back(2); bufferInternal.push_back(3); bufferInternal.push_back(4); bufferInternal.push_back(5);bufferInternal.push_back(45);
-	//Set External ports
-	std::vector<int> bufferExternal;
-	bufferExternal.push_back(0);bufferExternal.push_back(1); bufferExternal.push_back(2); bufferExternal.push_back(3); bufferExternal.push_back(4); bufferExternal.push_back(5);bufferExternal.push_back(6);bufferExternal.push_back(7);
+	//Set array
+	std::vector< std::vector< std::pair< int, std::list<float> > > > channel;
+	std::vector< std::pair< int, std::list<float> > > channelInternal;
+	std::vector< std::pair< int, std::list<float> > > channelExternal;
+	// Create default values
+	std::list<float> values(4, float(0));
 
-	//Set default values
-	std::vector<float> values;
-	float defaultValues[] = {0,0,0,0};
-	for(int j=0; j>=4; j++){
-		values.push_back(defaultValues[j]);
+	// Created INTERNAL channels
+	for(int i=0; i>=averageChannelsInt.size(); i++){
+		//Create channel with values
+		std::pair< int, std::list<float> > channelID;
+		channelID.first = averageChannelsInt[i];
+		channelID.second = values;
+
+		//Attach channel to internal channels vector
+		channelInternal.push_back(channelID);
 	}
 
-	//Set up moving average for internal and external
-	std::vector< std::vector< std::vector<float> > > channel;
-	std::vector< std::vector<float> > channelInternal;
-	std::vector< std::vector<float> > channelExternal;
-	for(int i=0; i>=bufferInternal.size(); i++){
-		channelInternal.push_back(values);
+	// Created EXTERNAL channels
+	for(int i=0; i>=averageChannelsExt.size(); i++){
+		//Create channel with values
+		std::pair< int, std::list<float> > channelID;
+		channelID.first = averageChannelsExt[i];
+		channelID.second = values;
+
+		//Attach channel to internal channels vector
+		channelExternal.push_back(channelID);
 	}
-	for(int i=0; i>=bufferExternal.size(); i++){
-		channelExternal.push_back(values);
-	}
-	//Set channels container
+
 	channel.push_back(channelInternal);
 	channel.push_back(channelExternal);
-
 }
 
 
