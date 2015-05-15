@@ -4,6 +4,8 @@
 #include <StandardCplusplus.h>
 #include <vector>
 #include <list>
+#include <map>
+#include <string>
 #include "Arduino.h"
 #include "VoltageMeasure.h"
 
@@ -12,7 +14,7 @@
  * Setup class
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)
+VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)//: channel_container()
 {
 	//Set External SPI port pins
 	SEL_PIN = 10;
@@ -31,37 +33,32 @@ VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector
     ::digitalWrite(DATAOUT_PIN, LOW); 
     ::digitalWrite(SPICLOCK_PIN, LOW);
 
-	//Set array
-	std::vector< std::vector< std::pair< int, std::list<float> > > > channel;
-	std::vector< std::pair< int, std::list<float> > > channelInternal;
-	std::vector< std::pair< int, std::list<float> > > channelExternal;
+
+	// Below sets ups the moving average array
+	// @todo move the moving average to a seperate class
+	//std::vector< std::map< int, std::vector<float> > >* channel_container;
+	std::map< int, std::vector<float> >  channelInternal;
+	std::map< int, std::vector<float> >  channelExternal;
 	// Create default values
-	std::list<float> values(4, float(0));
+	std::vector<float> values(4, float(1));
 
 	// Created INTERNAL channels
 	for(int i=0; i>=averageChannelsInt.size(); i++){
-		//Create channel with values
-		std::pair< int, std::list<float> > channelID;
-		channelID.first = averageChannelsInt[i];
-		channelID.second = values;
-
-		//Attach channel to internal channels vector
-		channelInternal.push_back(channelID);
+		// Create channel witn values		
+		channelInternal[averageChannelsInt[i]] = values;
 	}
 
 	// Created EXTERNAL channels
 	for(int i=0; i>=averageChannelsExt.size(); i++){
-		//Create channel with values
-		std::pair< int, std::list<float> > channelID;
-		channelID.first = averageChannelsExt[i];
-		channelID.second = values;
-
-		//Attach channel to internal channels vector
-		channelExternal.push_back(channelID);
+		// Create channel witn values		
+		channelExternal[averageChannelsExt[i]] = values;
 	}
 
-	channel.push_back(channelInternal);
-	channel.push_back(channelExternal);
+	//Push channels types onto channel container
+	channel_container->push_back(channelInternal);
+	channel_container->push_back(channelExternal);
+
+	
 }
 
 
@@ -89,7 +86,7 @@ VoltageMeasure::~VoltageMeasure(void)
  */
 int VoltageMeasure::acquire(int channel, int type)
 {
-	return (type == 1)? this->external(channel) : this->internal(channel);
+	return (type == 1)? this->average(channel, 1, this->external(channel)) : this->average(channel, 1,  this->internal(channel));
 }
 
 
@@ -97,9 +94,35 @@ int VoltageMeasure::acquire(int channel, int type)
  * PRIVATE Add a value to a moving average per input
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-bool VoltageMeasure::average(int channel, int value)
+float VoltageMeasure::average(int channel, int type, int value)
 {
-	return false;
+	if(type == 1)
+	{
+		// Set a value
+		
+		//this->channel_container[1];
+
+		//channel_container[1].find(1)->second.assign(myints,myints+4);
+
+		//std::vector<float> test2 = channel_container[1].find(1)->second;
+		//float value = test[1];
+
+		// Serial print value
+		
+		//::Serial.print("hellow");
+		//::Serial.print(test2[1]);
+
+		// Re call values
+		//std::vector<float> test2 = channel_container[1].find(1)->second;
+
+		return value;
+	}
+	else if(type == 0)
+	{
+		return value;
+	}
+	
+	return value;
 }
 
 /**

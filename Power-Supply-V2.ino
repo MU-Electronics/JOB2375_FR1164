@@ -7,19 +7,40 @@
 #include <serstream>
 #include <string>
 #include <vector>
+/**
+ * Require standard C++ libraries
+ */
 #include <iterator>
 #include <iostream>
 #include <algorithm>
 
+/**
+ * Require projects classes etc
+ */
 #include "LcdDisplay.h"
 #include "VoltageMeasure.h"
 
 
+
+
+
+
+
+/**
+ * Set required varables 
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ */
+// Internal ADCs that required a moving average
 int internalADC[] = {1,2,3,4,5}; 
 std::vector<int> averageChannelsInt(internalADC, internalADC + 5);
-
-int externalADC[] = {1,2,3,4,5,4,5,6,7,8}; 
+// Internal ADCs that required a moving average
+int externalADC[] = {0,1,2,3,4,5,6,7}; 
 std::vector<int> averageChannelsExt(externalADC, externalADC + 8);
+
+
+
+
+
 
 
 /**
@@ -28,6 +49,9 @@ std::vector<int> averageChannelsExt(externalADC, externalADC + 8);
  */
 LcdDisplay* Lcd = new LcdDisplay();
 VoltageMeasure* Voltages = new VoltageMeasure(averageChannelsInt, averageChannelsExt);
+
+
+
 
 
 
@@ -76,11 +100,11 @@ void loop()
 	//String Volt = "1";
 	
 
-	
+	Serial.println("hellow");
 
-	for (int i=0; i<=7; i++){
-		Serial.println(i);
-		String thisString = String(Voltages->get(i, 1));
+	for (int i=0; i<averageChannelsExt.size(); i++){
+		//Serial.println(averageChannelsExt[i]);
+		String thisString = String(Voltages->get(averageChannelsExt[i], 1));
 		Lcd->show("read: "+thisString, i);
 	}
 

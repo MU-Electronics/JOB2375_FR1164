@@ -173,9 +173,9 @@ bool LcdDisplay::clearBlock(int block)
 
 	// Find the number of sqaures to clear
 	int toClear;
-	if(block == 15)
+	if(block == 15 || block == 7)
 	{
-		toClear = this->BLOCK_COLS[block] - 40;
+		toClear = 40 - this->BLOCK_COLS[block];
 	}
 	else
 	{
