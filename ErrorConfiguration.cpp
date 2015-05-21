@@ -1,151 +1,106 @@
-#ifndef ErrorConfiguration
-#define ErrorConfiguration
-
 /**
  * Include relivent C++ Libraires
  */
 #include <StandardCplusplus.h>
 #include <map>
 #include <string>
-#include <algorithm>
-#include <sstream>
+#include <Arduino.h>
 
-/**
- * Define the error configuration container
- */
-static std::map< int, std::map< String, std::map<String, String> > > error_config_container;
-
-
-
-
-
-
-
-
-
-/**
- * Build error conditions empty
- */
-static int buildError( int id )
+namespace ErrorConfiguration
 {
-	// Define error boxes
-	std::map< String, std::map<String, String> > error_conditions;
-	std::map<String, String> error_values;
-
-	// Set three condtions
-	error_conditions["conditions"] = error_values;
-	error_conditions["message"] = error_values;
-	error_conditions["action_outputs"] = error_values;
-	error_conditions["action_method"] = error_values;
-
-	error_config_container[id] = error_conditions;
-
-	return id;
-}
+	/**
+	 * Define the error configuration container
+	 */
+	static std::map< int, std::map< String, std::map<String, String> > > error_config_container;
 
 
 
-/**
- * Constuct and define an error condtions
- */
-static int construct(int id, String* lowCon, String* highCon, String message, String* actionHigh, String* actionLow, String actionMethod)
-{
-	int build = buildError( id );
+	/**
+	 * HELPER FUNCTION: Build error conditions empty
+	 */
+	static int buildError( int id )
+	{
+		// Define error boxes
+		std::map< String, std::map<String, String> > error_conditions;
+		std::map<String, String> error_values;
 
-	// Define conditions
-    for (String *ptr = lowCon; *ptr; ptr++) {
-        error_config_container[id]["conditions"][*ptr] = "0";
-    }
-	for (String *ptr = highCon; *ptr; ptr++) {
-        error_config_container[id]["conditions"][*ptr] = "1";
-    }
+		// Set three condtions
+		error_conditions["conditions"] = error_values;
+		error_conditions["message"] = error_values;
+		error_conditions["action_outputs"] = error_values;
+		error_conditions["action_method"] = error_values;
 
-	// Define message
-	error_config_container[id]["message"]["1"] = message;
+		error_config_container[id] = error_conditions;
+
+		return id;
+	}
+
+
+
+	/**
+	 * HELPER FUNCTION: Constuct and define an error condtions
+	 */
+	static int construct(int id, std::map<String, String> condtions, std::map<String, String> actionOutput, String actionMessage, String actionMethod)
+	{
+		int build = buildError( id );
+
+		// Define conditions
+		error_config_container[id]["conditions"] = condtions;
+
+		// Define message
+		error_config_container[id]["message"]["0"] = actionMessage;
 	
-	// Define output actions
-	for (String *ptr = actionLow; *ptr; ptr++) {
-        error_config_container[id]["action_outputs"][*ptr] = "0";
-    }
-	for (String *ptr = actionHigh; *ptr; ptr++) {
-        error_config_container[id]["action_outputs"][*ptr] = "1";
-    }
+		// Define output actions
+		error_config_container[id]["action_outputs"] = actionOutput;
 
-	// Define action method
-	error_config_container[id]["action_method"]["0"] = actionMethod;
+		// Define action method
+		error_config_container[id]["action_method"]["0"] = actionMethod;
 
-	// Return the error condition id
-	return build;
+		// Return the error condition id
+		return build;
+	}
+
+
+
+	/**
+	 * Setup all system error configurations
+	 */
+	static void setupErrors( )
+	{
+		/////////////////////////////////////////
+		// Setup Plug and Swicth               //
+		/////////////////////////////////////////
+		// Define sub containers
+		std::map<String, String> plug_switch_condtions;
+		std::map<String, String> plug_switch_action;
+		// Define error conditions
+		plug_switch_condtions["30"] = "1"; plug_switch_condtions["32"] = "0";
+		// Define outputs on error
+		plug_switch_action["33"] = "1"; plug_switch_action["34"] = "1";
+		// Define LCD error message
+		String plug_switch_message = "Error with switch and plug";
+		// Define Error funnction
+		String plug_switch_function = "none";
+		// Merge data into main container
+		int plug_switch = construct(1, plug_switch_condtions, plug_switch_action, plug_switch_message, plug_switch_function);
+
+
+		/////////////////////////////////////////
+		// Set up interlock switches           //
+		/////////////////////////////////////////
+		// Define sub containers
+		std::map<String, String> interlocks_condtions;
+		std::map<String, String> interlocks_action;
+		// Define error conditions
+		interlocks_condtions["30"] = "1"; interlocks_condtions["32"] = "0";
+		// Define outputs on error
+		interlocks_action["33"] = "1"; interlocks_action["34"] = "1";
+		// Define LCD error message
+		String interlocks_message = "Error with interlocks";
+		// Define Error funnction
+		String interlocks_function = "interlocks";
+		// Merge data into main container
+		int interlock = construct(2, interlocks_condtions, interlocks_action, interlocks_message, interlocks_function);	
+	}
+
 }
-
-
-
-
-
-
-
-
-
-/**
- * Define conditions
- */
-//Plug and switch
-static String plug_switch_high_cond[] = {"30"};
-static String plug_switch_low_cond[] = {"32"};
-
-//Interlocks
-static String interlock_high_cond[] = {"22","23","24","25"};
-static String interlock_low_cond[] = {"0"};
-
-
-
-
-/**
- * Define messages
- */
-//Plug and switch
-static String plug_switch_message = "There is an error with the plug and switch";
-
-//Interlocks
-static String interlock_message = "There is an error with the interlock switches";
-
-
-
-
-/**
- * Define action pointer functions
- */
-//Plug and switch
-static String plug_switch_function = "none";
-
-//Interlocks
-static String interlock_function = "interlocks";
-
-
-
-/**
- * Define action outputs
- */
-//Plug and switch
-static String plug_switch_high_action[] = {"19"};
-static String plug_switch_low_action[] = {"0"};
-
-//Interlocks
-static String interlock_high_action[] = {"0"};
-static String interlock_low_action[] = {"0"};
-
-
-
-
-/**
- * Define errors
- */
-// Plug and switch error condition
-static int plug_switch_error_id = construct(1, plug_switch_low_cond, plug_switch_high_cond, plug_switch_message, plug_switch_high_action, plug_switch_low_action, plug_switch_function);
-
-//Interlocks error condition
-static int interlock_error_id = construct(2, interlock_low_cond, interlock_high_cond, interlock_message, interlock_high_action, interlock_low_action, interlock_function);
-
-
-
-#endif

@@ -4,9 +4,6 @@
 #include <LiquidCrystal.h>
 #include <StandardCplusplus.h>
 
-#include <serstream>
-#include <string>
-#include <vector>
 /**
  * Require standard C++ libraries
  */
@@ -14,18 +11,16 @@
 #include <iostream>
 #include <algorithm>
 #include <map>
-
-#include <string.h>
+#include <serstream>
+#include <string>
+#include <vector>
 
 /**
  * Require projects classes etc
  */
 #include "LcdDisplay.h"
 #include "VoltageMeasure.h"
-#include "ErrorConfiguration.cpp"
-
-
-
+#include "ErrorController.h"
 
 
 
@@ -41,13 +36,16 @@ std::vector<int> averageChannelsInt(internalADC, internalADC + 5);
 int externalADC[] = {0,1,2,3,4,5,6,7}; 
 std::vector<int> averageChannelsExt(externalADC, externalADC + 8);
 
-//Set Voltages
+// Set Voltages
 float DigitalVoltagesInt[] = {200,200,200,200,200}; 
 std::vector<float> DigitalVoltagesInternal(DigitalVoltagesInt, DigitalVoltagesInt + 5);
 float DigitalVoltagesExt[] = {200,4.096,700,200,200,200,200,200}; 
 std::vector<float> DigitalVoltagesExternal(DigitalVoltagesExt, DigitalVoltagesExt + 8);
 
-
+// LCD
+long previousMillis = 0;
+long previousMillis2 = 0;
+long updateEvery = 200;
 
 
 
@@ -57,9 +55,7 @@ std::vector<float> DigitalVoltagesExternal(DigitalVoltagesExt, DigitalVoltagesEx
  */
 LcdDisplay* Lcd = new LcdDisplay();
 VoltageMeasure* Voltages = new VoltageMeasure(averageChannelsInt, averageChannelsExt, DigitalVoltagesInternal, DigitalVoltagesExternal);
-long previousMillis = 0;
-long previousMillis2 = 0;
-long updateEvery = 200;
+ErrorController* Error = new ErrorController();
 
 
 
@@ -72,7 +68,8 @@ long updateEvery = 200;
  */
 void setup()
 {
-  Serial.begin(9600);
+	// Setup serial communication
+	Serial.begin(9600);
 }
 
 
@@ -87,17 +84,16 @@ void setup()
  */
 void loop()
 {
-	
-	//Update Moving Voltage
+	// Update Moving Voltage
 	Voltages->update(averageChannelsInt, averageChannelsExt);
 
-	//Only update LCD every set interval
+	// Only update LCD every set interval
 	unsigned long currentMillis = millis(); 
 	if(currentMillis - previousMillis > updateEvery) 
 	{
-		//Set lasted updated
+		// Set lasted updated
 		previousMillis = currentMillis; 
-		//Update LCD
+		// Update LCD
 		LcdUpdate();
 	}
 	

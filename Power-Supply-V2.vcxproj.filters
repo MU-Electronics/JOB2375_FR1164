@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Error">
+      <UniqueIdentifier>{93ca1f0d-eb19-453a-a0ee-735a15baac68}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LcdDisplay.cpp">
@@ -22,7 +25,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ErrorConfiguration.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Error</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorController.cpp">
+      <Filter>Error</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,6 +39,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VoltageMeasure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Visual Micro\.JOB2375_FR1164.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
