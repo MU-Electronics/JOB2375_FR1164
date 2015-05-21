@@ -14,7 +14,7 @@
  * Setup class
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)
+VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt, std::vector<float>& DigitalVoltagesInternal, std::vector<float>& DigitalVoltagesExternal)
 {
 	//Set External SPI port pins
 	SEL_PIN = 10;
@@ -33,9 +33,16 @@ VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector
     ::digitalWrite(DATAOUT_PIN, LOW); 
     ::digitalWrite(SPICLOCK_PIN, LOW);
 
+	//Set Bit size 
+	INTERNAL_ADC_BIT_SIZE = 1024;
+	EXTERNAL_ADC_BIT_SIZE = 4096;
+
+	// Set Voltages
+	voltages_internal = DigitalVoltagesInternal; 
+	voltages_external = DigitalVoltagesExternal;
 
 	// Define the number of samples
-	MOVING_AVERAGE_SAMPLES = 12;
+	MOVING_AVERAGE_SAMPLES = 5;
 	// Below sets ups the moving average array
 	std::map< int, std::map<int, float> >  channelInternal;
 	std::map< int, std::map<int, float> >  channelExternal;
@@ -83,13 +90,13 @@ VoltageMeasure::~VoltageMeasure(void)
  * @pram type Type of ADC. External = 1; Internal = 0;
  * @pram newValue Take a new value and re caculate the moving average or take just the current value
  */
-int VoltageMeasure::acquire(int channel, int type, bool newValue)
+float VoltageMeasure::acquire(int channel, int type)
 {
 	//Get the average voltage
-	float voltage = (type == 1)? this->average(channel, 2, this->external(channel), newValue) : this->average(channel, 1,  this->internal(channel), newValue);
+	float voltage = (type == 1)? this->average(channel, 2, this->external(channel)) : this->average(channel, 1,  this->internal(channel));
 
 	//We'll change to interger for now
-	return (voltage >= 0)?  (int) (voltage + 0.5) : (int) (voltage - 0.5);
+	return voltage;
 }
 
 
@@ -97,7 +104,7 @@ int VoltageMeasure::acquire(int channel, int type, bool newValue)
  * PRIVATE Add a value to a moving average per input
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-float VoltageMeasure::average(int channel, int type, int value, bool newValue)
+float VoltageMeasure::average(int channel, int type, int value)
 {
 	// channel_container[ internal or external ][ channel id ][ sample id ]
 	// For Example      channel_container[1][1][1] = float(5);        ::Serial.print(channel_container[1][1][1]);
@@ -106,30 +113,37 @@ float VoltageMeasure::average(int channel, int type, int value, bool newValue)
 	float total = 0;
 	for(int i=MOVING_AVERAGE_SAMPLES; i>=1; i--)
 	{
+
 		// Circular Buffer
-		if(newValue){
-			if(i == 1){ channel_container[type][channel][i] = float(value); }else{ channel_container[type][channel][i] = channel_container[type][channel][i-1];} 
-		}else{
-			if(channel_container[type][channel][MOVING_AVERAGE_SAMPLES] == NULL) {
-				if(i == 1){ channel_container[type][channel][i] = float(value); }else{ channel_container[type][channel][i] = channel_container[type][channel][i-1];} 
-			}
-		}
+		if(i == 1){ 
+			channel_container[type][channel][i] = float(value); 
+		}else{ 
+			channel_container[type][channel][i] = channel_container[type][channel][i-1];
+		} 
 		
 		//Add total 
 		total = total + channel_container[type][channel][i];
 	}
 
 	//Return total divided by number of samples
-	return ( total / MOVING_AVERAGE_SAMPLES );
+	
+	return this->digitalToVoltage(channel, type, ( total / MOVING_AVERAGE_SAMPLES ));
 }
 
 /**
  * PRIVATE Convert a digital value to a voltage
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-float VoltageMeasure::digitalToVoltage(int value)
+float VoltageMeasure::digitalToVoltage(int channel, int type, int value)
 {
-	return false;
+	float stepSize;
+	if(type == 2){
+		stepSize = voltages_external[channel] / EXTERNAL_ADC_BIT_SIZE;
+	}else{
+		stepSize =  voltages_internal[channel] / INTERNAL_ADC_BIT_SIZE;
+	}
+	
+	return stepSize * value;
 }
 
 /**
@@ -189,7 +203,7 @@ int VoltageMeasure::external(int channel)
 
 	// Turn off device ADC
 	::digitalWrite(SEL_PIN, HIGH); 
-	
+
 	//Return value
 	return adcvalue;
 }
@@ -206,9 +220,9 @@ int VoltageMeasure::external(int channel)
  * @pram input The channel to be read relative to the type
  * @pram type The type of ADC, Extenal = 1; Internal = 0;
  */
-int VoltageMeasure::get(int channel, int type, bool refresh = true)
+float VoltageMeasure::get(int channel, int type)
 {
-	return this->acquire(channel, type, refresh);
+	return this->acquire(channel, type);
 }
 
 /**
@@ -220,13 +234,15 @@ bool VoltageMeasure::update(std::vector<int>& averageChannelsInt, std::vector<in
 	// Update internal channel's moving average values
 	for(int i=0; i>=averageChannelsInt.size(); i++){
 		// Create channel witn values		
-		this->get(averageChannelsInt[i], 0, true);
+		this->get(averageChannelsInt[i], 0);
 	}
 
 	// Update external channel's moving average values
 	for(int i=0; i>=averageChannelsExt.size(); i++){
 		// Create channel witn values		
-		this->get(averageChannelsExt[i], 1, true);
+		this->get(averageChannelsExt[i], 1);
 	}
+
+	return true;
 }
 
