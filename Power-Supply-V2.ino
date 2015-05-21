@@ -22,6 +22,7 @@
  */
 #include "LcdDisplay.h"
 #include "VoltageMeasure.h"
+#include "ErrorConfiguration.cpp"
 
 
 
@@ -87,21 +88,10 @@ void setup()
 void loop()
 {
 	
-	//unsigned long currentMillis2 = millis(); 
-	//if(currentMillis2 - previousMillis2 > 1) 
-	//{
-		//Set lasted updated
-		//previousMillis2 = currentMillis2; 
+	//Update Moving Voltage
+	Voltages->update(averageChannelsInt, averageChannelsExt);
 
-		//float currentMillisCount = micros(); 
-		//Update LCD
-		Voltages->update(averageChannelsInt, averageChannelsExt);
-		//float currentMillisCount2 = micros();
-
-		//Serial.println(currentMillisCount2-currentMillisCount);
-		//delay(200);
-	//}
-
+	//Only update LCD every set interval
 	unsigned long currentMillis = millis(); 
 	if(currentMillis - previousMillis > updateEvery) 
 	{

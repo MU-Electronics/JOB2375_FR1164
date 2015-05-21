@@ -76,6 +76,7 @@
     <ClInclude Include="VoltageMeasure.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ErrorConfiguration.cpp" />
     <ClCompile Include="LcdDisplay.cpp" />
     <ClCompile Include="VoltageMeasure.cpp" />
   </ItemGroup>

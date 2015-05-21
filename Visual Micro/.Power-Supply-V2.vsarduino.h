@@ -87,6 +87,7 @@ extern "C" void __cxa_pure_virtual() {;}
 #define portInputRegister(P)
 #define portModeRegister(P)
 #include <Power-Supply-V2.ino>
+#include <ErrorConfiguration.cpp>
 #include <LcdDisplay.cpp>
 #include <LcdDisplay.h>
 #include <VoltageMeasure.cpp>
