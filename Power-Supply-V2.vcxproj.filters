@@ -16,19 +16,25 @@
     <Filter Include="Error">
       <UniqueIdentifier>{93ca1f0d-eb19-453a-a0ee-735a15baac68}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Lcd">
+      <UniqueIdentifier>{8ff2938c-7524-4f62-a215-bca25d2440c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Voltage">
+      <UniqueIdentifier>{c584982e-0808-491d-8349-bb2fc302471c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LcdDisplay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VoltageMeasure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ErrorConfiguration.cpp">
       <Filter>Error</Filter>
     </ClCompile>
     <ClCompile Include="ErrorController.cpp">
       <Filter>Error</Filter>
+    </ClCompile>
+    <ClCompile Include="LcdDisplay.cpp">
+      <Filter>Lcd</Filter>
+    </ClCompile>
+    <ClCompile Include="VoltageMeasure.cpp">
+      <Filter>Voltage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
