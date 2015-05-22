@@ -44,20 +44,20 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LcdDisplay.h">
-      <Filter>Miscellaneous\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Visual Micro\.Power-Supply-V2.vsarduino.h">
       <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Visual Micro\.JOB2375_FR1164.vsarduino.h">
       <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ErrorController.h">
-      <Filter>Miscellaneous\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Voltage.h">
-      <Filter>Miscellaneous\Header Files</Filter>
+      <Filter>Voltage</Filter>
+    </ClInclude>
+    <ClInclude Include="LcdDisplay.h">
+      <Filter>Lcd</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorController.h">
+      <Filter>Error</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

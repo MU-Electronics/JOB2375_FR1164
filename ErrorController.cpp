@@ -32,6 +32,8 @@ ErrorController::ErrorController()
 		for (std::map<int, String>::iterator output=error_container[i]["action_outputs"].begin(); output!=error_container[i]["action_outputs"].end(); ++output){
 			// Get value of input
 			::pinMode(output->first, OUTPUT); 
+
+			::Serial.println(output->first);
 		}
 	}
 }
@@ -68,7 +70,9 @@ bool ErrorController::ensure(int id)
 
 		// Is condition is met OR not
 		if( (condition->second == "HIGH" && val == LOW) || (condition->second == "LOW" && val == HIGH)){
+			// Add the id to the triggered errors
 			triggeredErrors.push_back(id);
+			// Run the failed condtions method
 			this->condtionFailed(id);
 		}else{
 			//Remove error condition for errors that have been fixed
@@ -92,8 +96,9 @@ bool ErrorController::ensure(int id)
  */
 bool ErrorController::condtionSuccess(int id)
 {
+	// Set desired outputs
 	this->output(id, 2);
-	::Serial.println("hellow");
+	this->lcdMessage("0", 0);
 	return false;
 }
 
@@ -106,42 +111,46 @@ bool ErrorController::condtionSuccess(int id)
  */
 bool ErrorController::condtionFailed(int id)
 {
+	// Set desired outputs
 	this->output(id, 1);
-	
+	this->lcdMessage("This is an error", 1);
 	return false;
 }
 
 /**
  * PRIVATE Set outputs to correct value when error condtion is met
  * @author Sam Mottley sam.mottley@manchester.ac.uk
+ * @todo tidy the below
  *
  * @pram id ID of the error condition
  * @pram direction Is the error being disabled or enabled? 1=enabled 2 = disabled
  */
 bool ErrorController::output(int id, int direction)
 {
-	std::map<int, String> actionoutputs = error_container[id]["action_outputs"];
+	// Is this behavour required?
+	if (error_container[id].find("action_outputs") != error_container[id].end() ){
+		// The the actions required
+		std::map<int, String> actionoutputs = error_container[id]["action_outputs"];
 
-	if(direction == 1){
 		for (std::map<int, String>::iterator output=actionoutputs.begin(); output!=actionoutputs.end(); ++output){
-			// Set the outputs
-			if(output->second == "HIGH")
+			// Double check pin is output
+			::pinMode(output->first, OUTPUT); 
+
+			//Decide the output
+			if(output->second == "HIGH" && direction == 1){
 				::digitalWrite(output->first, HIGH); 
-
-			if(output->second == "LOW")
-				::digitalWrite(output->first, LOW);
-		}
-	}else if(direction == 2){
-		for (std::map<int, String>::iterator output=actionoutputs.begin(); output!=actionoutputs.end(); ++output){
-			// Reverse the outputs
-			if(output->second == "HIGH")
+			}else if(output->second == "HIGH" && direction == 2){
 				::digitalWrite(output->first, LOW); 
-
-			if(output->second == "LOW")
+			}else if(output->second == "LOW" && direction == 1){
+				::digitalWrite(output->first, LOW); 
+			}else if(output->second == "LOW" && direction == 2){
 				::digitalWrite(output->first, HIGH);
+			}else{
+				::digitalWrite(output->first, LOW);
+			}
 		}
 	}
-	
+
 	return true;
 }
 
@@ -162,8 +171,9 @@ bool ErrorController::runMethod(String method)
  *
  * @pram message Message to be wrote to LCD screen
  */
-bool ErrorController::lcdMessage(String message)
+bool ErrorController::lcdMessage(String message, int direction)
 {
+	//::Lcd->errorCondition(message, direction);
 	return false;
 }
 

@@ -13,7 +13,7 @@ public:
 private:
 	bool output(int id, int direction);
 	bool runMethod(String method);
-	bool lcdMessage(String message);
+	bool lcdMessage(String message, int direction);
 	bool ensure(int id);
 	bool condtionFailed(int id);
 	bool condtionSuccess(int id);

@@ -147,15 +147,18 @@ bool LcdDisplay::print(String string, int block)
  */
 bool LcdDisplay::show(String toShow, int block)
 {
-	// Set block
-	bool blockSet = this->setBlock(block);
+	// Is system in error mode?
+	if(errorEnabled == 1){
+		// Set block
+		bool blockSet = this->setBlock(block);
 
-	// If block set successfully 
-	if(blockSet)
-	{
-		// Show string
-		if(this->print(toShow, block))	
-			return true;
+		// If block set successfully 
+		if(blockSet)
+		{
+			// Show string
+			if(this->print(toShow, block))	
+				return true;
+		}
 	}
 	
 	// Something went wrong throw exception??
@@ -196,3 +199,21 @@ bool LcdDisplay::clearBlock(int block)
 }
 
 
+/**
+ * PUBLIC Puts LCD into error condition view
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ */
+bool LcdDisplay::errorCondition(String message, int direction)
+{
+	if(direction == 1){
+		//Enable to error state
+		errorEnabled = 1;
+		//Clear display
+		this->lcd[1]->clear();
+		//Show message
+		this->lcd[1]->print(message);
+	}else{
+		//Enable to error state
+		errorEnabled = 0;
+	}
+}
