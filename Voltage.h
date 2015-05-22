@@ -19,13 +19,13 @@ class VoltageMeasure
 		float digitalToVoltage(int channel, int type, int value);
 		float acquire(int channel, int type);
 		std::map< int, std::map< int, std::map<int, float> > > channel_container;
-		std::vector<float> voltages_internal; 
-		std::vector<float> voltages_external;
+		std::map<int, float> voltages_internal; 
+		std::map<int, float> voltages_external;
 	public:
-		VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt, std::vector<float>& DigitalVoltagesInternal, std::vector<float>& DigitalVoltagesExternal);
+		VoltageMeasure();
 		~VoltageMeasure(void);
 		float get(int channel, int type);
-		bool update(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt);
+		bool update(std::map<int, float>& averageChannelsInt, std::map<int, float>& averageChannelsExt);
 			
 };
 

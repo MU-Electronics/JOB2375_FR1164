@@ -8,19 +8,29 @@
 #include <string>
 #include "Arduino.h"
 #include "Voltage.h"
+#include "VoltageConfiguration.cpp"
+#include <iterator>
 
 
 /**
  * Setup class
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt, std::vector<float>& DigitalVoltagesInternal, std::vector<float>& DigitalVoltagesExternal)
+VoltageMeasure::VoltageMeasure()
 {
+	//Get configuration for ADC (internal and external)
+	std::map< String, std::map<String, int> > setupAdcs;
+	setupAdcs = VoltageConfiguration::setupAdcs();
+
+	//Get configuration for equivilent voltages (internal and external)
+	std::map< String, std::map<int, float> > setupVoltages;
+	setupVoltages = VoltageConfiguration::setupVoltages();
+
 	//Set External SPI port pins
-	SEL_PIN = 10;
-	DATAOUT_PIN = 11;
-	DATAIN_PIN = 13;
-	SPICLOCK_PIN = 12;
+	SEL_PIN = setupAdcs["EXTERNAL_ADC"]["SEL_PIN"];
+	DATAOUT_PIN = setupAdcs["EXTERNAL_ADC"]["DATAOUT_PIN"];
+	DATAIN_PIN = setupAdcs["EXTERNAL_ADC"]["DATAIN_PIN"];
+	SPICLOCK_PIN = setupAdcs["EXTERNAL_ADC"]["SPICLOCK_PIN"];
 
 	 // Set pin modes 
     ::pinMode(SEL_PIN, OUTPUT); 
@@ -34,36 +44,16 @@ VoltageMeasure::VoltageMeasure(std::vector<int>& averageChannelsInt, std::vector
     ::digitalWrite(SPICLOCK_PIN, LOW);
 
 	//Set Bit size 
-	INTERNAL_ADC_BIT_SIZE = 1024;
-	EXTERNAL_ADC_BIT_SIZE = 4096;
+	INTERNAL_ADC_BIT_SIZE = setupAdcs["INTERNAL_ADC"]["BIT_SIZE"];
+	EXTERNAL_ADC_BIT_SIZE = setupAdcs["EXTERNAL_ADC"]["BIT_SIZE"];
 
 	// Set Voltages
-	voltages_internal = DigitalVoltagesInternal; 
-	voltages_external = DigitalVoltagesExternal;
+	voltages_internal = setupVoltages["INTERNAL"]; 
+	voltages_external = setupVoltages["EXTERNAL"];
 
 	// Define the number of samples
-	MOVING_AVERAGE_SAMPLES = 5;
-	// Below sets ups the moving average array
-	std::map< int, std::map<int, float> >  channelInternal;
-	std::map< int, std::map<int, float> >  channelExternal;
-	// Create default values
-	std::map<int, float> values;
+	MOVING_AVERAGE_SAMPLES = VoltageConfiguration::setupMovingAverage();
 
-	// Created INTERNAL channels
-	for(int i=0; i>=averageChannelsInt.size(); i++){
-		// Create channel witn values		
-		channelInternal[averageChannelsInt[i]] = values;
-	}
-
-	// Created EXTERNAL channels
-	for(int i=0; i>=averageChannelsExt.size(); i++){
-		// Create channel witn values		
-		channelExternal[averageChannelsExt[i]] = values;
-	}
-
-	//Push channels types onto channel container
-	channel_container[0] = channelInternal;
-	channel_container[1] = channelExternal;
 }
 
 
@@ -229,18 +219,18 @@ float VoltageMeasure::get(int channel, int type)
  * PUBLIC Update all voltages moving averages
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-bool VoltageMeasure::update(std::vector<int>& averageChannelsInt, std::vector<int>& averageChannelsExt)
+bool VoltageMeasure::update(std::map<int, float>& averageChannelsInt, std::map<int, float>& averageChannelsExt)
 {
-	// Update internal channel's moving average values
-	for(int i=0; i>=averageChannelsInt.size(); i++){
+	// Update internal channel's moving average value
+	for (std::map<int, float>::iterator channelI=averageChannelsInt.begin(); channelI!=averageChannelsInt.end(); ++channelI){
 		// Create channel witn values		
-		this->get(averageChannelsInt[i], 0);
+		this->get(channelI->first, 0);
 	}
 
 	// Update external channel's moving average values
-	for(int i=0; i>=averageChannelsExt.size(); i++){
+	for (std::map<int, float>::iterator channelE=averageChannelsExt.begin(); channelE!=averageChannelsExt.end(); ++channelE){
 		// Create channel witn values		
-		this->get(averageChannelsExt[i], 1);
+		this->get(channelE->first, 1);
 	}
 
 	return true;

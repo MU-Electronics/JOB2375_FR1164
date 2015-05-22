@@ -14,6 +14,7 @@
 #include <serstream>
 #include <string>
 #include <vector>
+#include <iterator>
 
 
 
@@ -23,7 +24,7 @@
 #include "LcdDisplay.h"
 #include "Voltage.h"
 #include "ErrorController.h"
-
+#include "VoltageConfiguration.cpp"
 
 
 
@@ -31,30 +32,20 @@
  * Set required varables 
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-// Internal ADCs that required a moving average
-int internalADC[] = {1,2,3,4,5}; 
-std::vector<int> averageChannelsInt(internalADC, internalADC + 5);
-// Internal ADCs that required a moving average
-int externalADC[] = {0,1,2,3,4,5,6,7}; 
-std::vector<int> averageChannelsExt(externalADC, externalADC + 8);
-
-// Set Voltages
-float DigitalVoltagesInt[] = {200,200,200,200,200}; 
-std::vector<float> DigitalVoltagesInternal(DigitalVoltagesInt, DigitalVoltagesInt + 5);
-float DigitalVoltagesExt[] = {200,4.096,700,200,200,200,200,200}; 
-std::vector<float> DigitalVoltagesExternal(DigitalVoltagesExt, DigitalVoltagesExt + 8);
-
-// LCD
+std::map< String, std::map<int, float> > setupVoltages = VoltageConfiguration::setupVoltages();
 long previousMillis = 0;
 long previousMillis2 = 0;
 long updateEvery = 200;
+
+
+
 
 /**
  * Init singleton classes
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 LcdDisplay* Lcd = new LcdDisplay();
-VoltageMeasure* Voltages = new VoltageMeasure(averageChannelsInt, averageChannelsExt, DigitalVoltagesInternal, DigitalVoltagesExternal);
+VoltageMeasure* Voltages = new VoltageMeasure();
 ErrorController* ErrorHandler = new ErrorController();
 
 
@@ -83,7 +74,7 @@ void setup()
 void loop()
 {
 	// Update Moving Voltage
-	Voltages->update(averageChannelsInt, averageChannelsExt);
+	Voltages->update(setupVoltages["INTERNAL"], setupVoltages["EXTERNAL"]);
 
 	// Only update LCD every set interval
 	unsigned long currentMillis = millis(); 
@@ -101,29 +92,39 @@ void loop()
 
 
 
-
 /**
  * Update LCD Display
  */
 void LcdUpdate()
 {
-	Lcd->show("VA:"+FloatToString(Voltages->get(averageChannelsExt[1], 0))+"v ", 0);
-	Lcd->show("VB:"+FloatToString(Voltages->get(averageChannelsExt[2], 0))+"v ", 1);
-	Lcd->show("VC:"+FloatToString(Voltages->get(averageChannelsExt[3], 0))+"v ", 2);
-	Lcd->show("VD:"+FloatToString(Voltages->get(averageChannelsExt[4], 1))+"v ", 3);
-	Lcd->show("VE:"+FloatToString(Voltages->get(averageChannelsExt[0], 1))+"v ", 4);
-	Lcd->show("VF:"+FloatToString(Voltages->get(averageChannelsExt[1], 1))+"v ", 5);
-	Lcd->show("VG:"+FloatToString(Voltages->get(averageChannelsExt[2], 1))+"v ", 6);
-	Lcd->show("VH:"+FloatToString(Voltages->get(averageChannelsExt[3], 1))+"v ", 7);
-	Lcd->show("VI:"+FloatToString(Voltages->get(averageChannelsExt[4], 1))+"v ", 8);
-	Lcd->show("VJ:"+FloatToString(Voltages->get(averageChannelsExt[5], 1))+"v ", 9);
-	Lcd->show("VK:"+FloatToString(Voltages->get(averageChannelsExt[6], 1))+"v ", 10);
-	Lcd->show("VL:"+FloatToString(Voltages->get(averageChannelsExt[7], 1))+"v ", 11);
+	// Set block
+	int i = 0;
+
+	// Update internal channel's moving average value
+	for (std::map<int, float>::iterator channelI=setupVoltages["INTERNAL"].begin(); channelI!=setupVoltages["INTERNAL"].end(); ++channelI){
+	    // Create channel witn values		
+		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelI->first, 0))+"v ", i);
+		i++;
+	}
+
+	// Update external channel's moving average values
+	for (std::map<int, float>::iterator channelE=setupVoltages["EXTERNAL"].begin(); channelE!=setupVoltages["EXTERNAL"].end(); ++channelE){
+	    // Create channel witn values		
+		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelE->first, 1))+"v ", i);
+		i++;
+	}
 }
 
 
+
+
+
+
+
+
+
 /**
- * Convert a float value to a string 
+ * HELPER Convert a float value to a string 
  */
 String FloatToString(float value)
 {
@@ -132,6 +133,18 @@ String FloatToString(float value)
 
 	return String(string);
 }
+
+/**
+ * HELPER Convert a number into a letter
+ */
+String numberToLetter(int n)
+{
+    if(n >= 1 && n <= 26)
+		return String("abcdefghijklmnopqrstuvwxyz"[n-1]);
+
+	return "A";
+}
+
 
 /*
 Lcd->show("HV ON ", 12);

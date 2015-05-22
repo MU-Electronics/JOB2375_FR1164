@@ -13,7 +13,7 @@
 ErrorController::ErrorController()
 {
 	// Get error setups
-	std::map< int, std::map< String, std::map<String, String> > > error_config_container;
+	std::vector< std::map< String, std::map<String, String> > > error_config_container;
 
 	// Setup system error condtions
 	error_config_container = ErrorConfiguration::setupErrors();
