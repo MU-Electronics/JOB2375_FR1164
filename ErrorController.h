@@ -1,13 +1,13 @@
-#pragma once
-
 #include <string>
 #include <map>
 #include <Arduino.h>
 
+#pragma once
+
 class ErrorController
 {
 public:
-	ErrorController(void);
+	ErrorController();
 	~ErrorController(void);
 	bool check(int id);
 private:

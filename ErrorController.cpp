@@ -10,13 +10,14 @@
  * Setup class
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-ErrorController::ErrorController(void)
+ErrorController::ErrorController()
 {
-	// Setup system error condtions
-	ErrorConfiguration::setupErrors();
+	// Get error setups
+	std::map< int, std::map< String, std::map<String, String> > > error_config_container;
 
-	// Set error container
-	std::map< int, std::map< String, std::map<String, String> > > error_container = ErrorConfiguration::error_config_container;
+	// Setup system error condtions
+	error_config_container = ErrorConfiguration::setupErrors();
+
 }
 
 

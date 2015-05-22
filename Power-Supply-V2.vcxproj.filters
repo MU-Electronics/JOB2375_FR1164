@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Error">
       <UniqueIdentifier>{93ca1f0d-eb19-453a-a0ee-735a15baac68}</UniqueIdentifier>
     </Filter>
@@ -21,6 +9,21 @@
     </Filter>
     <Filter Include="Voltage">
       <UniqueIdentifier>{c584982e-0808-491d-8349-bb2fc302471c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Miscellaneous">
+      <UniqueIdentifier>{5a84a4d3-4b85-4ea8-8599-4e7cedb9d6ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Miscellaneous\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Miscellaneous\Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Miscellaneous\Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -33,25 +36,28 @@
     <ClCompile Include="LcdDisplay.cpp">
       <Filter>Lcd</Filter>
     </ClCompile>
-    <ClCompile Include="VoltageMeasure.cpp">
+    <ClCompile Include="VoltageConfiguration.cpp">
+      <Filter>Voltage</Filter>
+    </ClCompile>
+    <ClCompile Include="Voltage.cpp">
       <Filter>Voltage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LcdDisplay.h">
-      <Filter>Header Files</Filter>
+      <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Visual Micro\.Power-Supply-V2.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VoltageMeasure.h">
-      <Filter>Header Files</Filter>
+      <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Visual Micro\.JOB2375_FR1164.vsarduino.h">
-      <Filter>Header Files</Filter>
+      <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ErrorController.h">
-      <Filter>Header Files</Filter>
+      <Filter>Miscellaneous\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Voltage.h">
+      <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

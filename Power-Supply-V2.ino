@@ -15,11 +15,13 @@
 #include <string>
 #include <vector>
 
+
+
 /**
  * Require projects classes etc
  */
 #include "LcdDisplay.h"
-#include "VoltageMeasure.h"
+#include "Voltage.h"
 #include "ErrorController.h"
 
 
@@ -47,17 +49,13 @@ long previousMillis = 0;
 long previousMillis2 = 0;
 long updateEvery = 200;
 
-
-
 /**
  * Init singleton classes
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 LcdDisplay* Lcd = new LcdDisplay();
 VoltageMeasure* Voltages = new VoltageMeasure(averageChannelsInt, averageChannelsExt, DigitalVoltagesInternal, DigitalVoltagesExternal);
-ErrorController* Error = new ErrorController();
-
-
+ErrorController* ErrorHandler = new ErrorController();
 
 
 
