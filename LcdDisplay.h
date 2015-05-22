@@ -3,7 +3,7 @@
  */
 #include "LiquidCrystal.h"
 #include "String.h"
-
+#include <map>
 
 
 
@@ -21,6 +21,7 @@ class LcdDisplay
 		bool setBlock(int block);
 		bool print(String string, int block);
 		int errorEnabled;
+		
 	public:
 		//Set up LCD ID for blocks
 		int BLOCK_LCD_IDS[16];
@@ -31,6 +32,6 @@ class LcdDisplay
 		LiquidCrystal* lcd[2];
 		bool show(String toShow, int block);
 		bool clearBlock(int block);
-		bool errorCondition(String message, int direction);
+		bool errorCondition(std::map<int, String> message, int direction);
 };
 

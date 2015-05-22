@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
-
+#include <memory>
 
 
 /**
@@ -22,7 +22,6 @@
 #include "Voltage.h"
 #include "ErrorController.h"
 #include "VoltageConfiguration.cpp"
-
 
 
 /**
@@ -43,6 +42,8 @@ long updateEvery = 50;
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 LcdDisplay* Lcd = new LcdDisplay();
+
+//std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay());
 VoltageMeasure* Voltages = new VoltageMeasure();
 ErrorController* ErrorHandler = new ErrorController();
 

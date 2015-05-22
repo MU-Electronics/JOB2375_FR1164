@@ -4,7 +4,7 @@
 #include "LcdDisplay.h"
 #include <vector>
 #include <algorithm>
-
+#include <map>
 
 
 
@@ -148,7 +148,7 @@ bool LcdDisplay::print(String string, int block)
 bool LcdDisplay::show(String toShow, int block)
 {
 	// Is system in error mode?
-	if(errorEnabled == 1){
+	if(errorEnabled != 1){
 		// Set block
 		bool blockSet = this->setBlock(block);
 
@@ -203,17 +203,26 @@ bool LcdDisplay::clearBlock(int block)
  * PUBLIC Puts LCD into error condition view
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-bool LcdDisplay::errorCondition(String message, int direction)
+bool LcdDisplay::errorCondition(std::map<int, String> message, int direction)
 {
 	if(direction == 1){
-		//Enable to error state
-		errorEnabled = 1;
-		//Clear display
-		this->lcd[1]->clear();
-		//Show message
-		this->lcd[1]->print(message);
+		if(errorEnabled != 1){
+			// Enable to error state
+			errorEnabled = 1;
+			// Clear display
+			this->lcd[1]->clear();
+			this->lcd[2]->clear();
+			// Show message
+			this->move(1, 0, 0); this->lcd[1]->print(message[0]);
+			this->move(1, 0, 1); this->lcd[1]->print(message[1]);
+			this->move(2, 0, 0); this->lcd[2]->print(message[2]);
+			this->move(2, 0, 1); this->lcd[2]->print(message[3]);
+		}
 	}else{
-		//Enable to error state
+		// Disable to error state
 		errorEnabled = 0;
+		// Clear display
+		this->lcd[1]->clear();
+		this->lcd[2]->clear();
 	}
 }

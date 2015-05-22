@@ -1,8 +1,10 @@
 #include <string>
 #include <map>
 #include <Arduino.h>
+#include "LcdDisplay.h"
 
 #pragma once
+extern LcdDisplay* Lcd;
 
 class ErrorController
 {
@@ -13,7 +15,7 @@ public:
 private:
 	bool output(int id, int direction);
 	bool runMethod(String method);
-	bool lcdMessage(String message, int direction);
+	bool lcdMessage(std::map<int, String> message, int direction);
 	bool ensure(int id);
 	bool condtionFailed(int id);
 	bool condtionSuccess(int id);

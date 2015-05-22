@@ -6,6 +6,7 @@
 #include <iterator>
 #include <Arduino.h>
 #include <algorithm>
+#include "LcdDisplay.h"
 
 
 /**
@@ -32,8 +33,6 @@ ErrorController::ErrorController()
 		for (std::map<int, String>::iterator output=error_container[i]["action_outputs"].begin(); output!=error_container[i]["action_outputs"].end(); ++output){
 			// Get value of input
 			::pinMode(output->first, OUTPUT); 
-
-			::Serial.println(output->first);
 		}
 	}
 }
@@ -62,6 +61,7 @@ bool ErrorController::ensure(int id)
 {
 	// Get the condition settings
 	std::map<int, String> conditions = error_container[id]["conditions"];
+	std::vector<int> triggeredErrorsNexted;
 
 	//Loop though the error conditions that should not be meet
 	for (std::map<int, String>::iterator condition=conditions.begin(); condition!=conditions.end(); ++condition){
@@ -70,19 +70,21 @@ bool ErrorController::ensure(int id)
 
 		// Is condition is met OR not
 		if( (condition->second == "HIGH" && val == LOW) || (condition->second == "LOW" && val == HIGH)){
-			// Add the id to the triggered errors
-			triggeredErrors.push_back(id);
-			// Run the failed condtions method
-			this->condtionFailed(id);
-		}else{
-			//Remove error condition for errors that have been fixed
-			if(std::find(triggeredErrors.begin(), triggeredErrors.end(), id) != triggeredErrors.end()){
-				this->condtionSuccess(id);
+			if(std::find(triggeredErrorsNexted.begin(), triggeredErrorsNexted.end(), id) == triggeredErrorsNexted.end()){
+				// Add the id to the triggered errors
+				triggeredErrorsNexted.push_back(id);
 			}
 		}
 	}
 	
-
+	// Run relivent functions
+	if(std::find(triggeredErrorsNexted.begin(), triggeredErrorsNexted.end(), id) != triggeredErrorsNexted.end()){
+		triggeredErrors.push_back(id);
+		this->condtionFailed(id);
+	}else if(std::find(triggeredErrors.begin(), triggeredErrors.end(), id) != triggeredErrors.end()){
+		triggeredErrors.resize(std::remove(triggeredErrors.begin(), triggeredErrors.end(), id) - triggeredErrors.begin());
+		this->condtionSuccess(id);
+	}
 	
 	return false;
 }
@@ -98,7 +100,7 @@ bool ErrorController::condtionSuccess(int id)
 {
 	// Set desired outputs
 	this->output(id, 2);
-	this->lcdMessage("0", 0);
+	this->lcdMessage(error_container[id]["action_message"], 0);
 	return false;
 }
 
@@ -113,8 +115,9 @@ bool ErrorController::condtionFailed(int id)
 {
 	// Set desired outputs
 	this->output(id, 1);
-	this->lcdMessage("This is an error", 1);
-	return false;
+	// Set disired lcd message
+	this->lcdMessage(error_container[id]["action_message"], 1);
+	return true;
 }
 
 /**
@@ -171,10 +174,10 @@ bool ErrorController::runMethod(String method)
  *
  * @pram message Message to be wrote to LCD screen
  */
-bool ErrorController::lcdMessage(String message, int direction)
+bool ErrorController::lcdMessage(std::map<int, String> message, int direction)
 {
-	//::Lcd->errorCondition(message, direction);
-	return false;
+	::Lcd->errorCondition(message, direction);
+	return true;
 }
 
 
@@ -191,9 +194,9 @@ bool ErrorController::check()
 {
 	// @todo Run one condition for now, loop though all in end
 	// Loop though error condtions
-	//for(int i = 0; i < error_container.size(); i++){
-		this->ensure(0);
-	//}
+	for(int i = 0; i < error_container.size(); i++){
+		this->ensure(i);
+	}
 
 	return false;
 }
