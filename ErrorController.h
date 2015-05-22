@@ -9,13 +9,16 @@ class ErrorController
 public:
 	ErrorController();
 	~ErrorController(void);
-	bool check(int id);
+	bool check();
 private:
-	bool output(std::map<String, String> outputs);
+	bool output(int id, int direction);
 	bool runMethod(String method);
 	bool lcdMessage(String message);
 	bool ensure(int id);
+	bool condtionFailed(int id);
+	bool condtionSuccess(int id);
 protected:
-	std::map< int, std::map< String, std::map<String, String> > > error_container;
+	std::vector< std::map< String, std::map<int, String> > > error_container;
+	std::vector<int> triggeredErrors;
 };
 

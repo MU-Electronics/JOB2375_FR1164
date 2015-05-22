@@ -1,17 +1,14 @@
 /**
- * Include libraries
+ * Include exteneral libraries
  */
 #include <LiquidCrystal.h>
 #include <StandardCplusplus.h>
 
+
 /**
- * Require standard C++ libraries
+ * Require standard C++ external libraries
  */
-#include <iterator>
-#include <iostream>
-#include <algorithm>
 #include <map>
-#include <serstream>
 #include <string>
 #include <vector>
 #include <iterator>
@@ -19,7 +16,7 @@
 
 
 /**
- * Require projects classes etc
+ * Require internal project files
  */
 #include "LcdDisplay.h"
 #include "Voltage.h"
@@ -33,9 +30,10 @@
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 std::map< String, std::map<int, float> > setupVoltages = VoltageConfiguration::setupVoltages();
+std::map< String, std::map<int, int> > setupVoltagesAccurcy = VoltageConfiguration::setupVoltagesAccurcy();
 long previousMillis = 0;
 long previousMillis2 = 0;
-long updateEvery = 200;
+long updateEvery = 50;
 
 
 
@@ -73,6 +71,9 @@ void setup()
  */
 void loop()
 {
+	// Check for error condtions
+	ErrorHandler->check();
+
 	// Update Moving Voltage
 	Voltages->update(setupVoltages["INTERNAL"], setupVoltages["EXTERNAL"]);
 
@@ -85,7 +86,6 @@ void loop()
 		// Update LCD
 		LcdUpdate();
 	}
-	
 }
 
 
@@ -94,6 +94,7 @@ void loop()
 
 /**
  * Update LCD Display
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
 void LcdUpdate()
 {
@@ -102,15 +103,17 @@ void LcdUpdate()
 
 	// Update internal channel's moving average value
 	for (std::map<int, float>::iterator channelI=setupVoltages["INTERNAL"].begin(); channelI!=setupVoltages["INTERNAL"].end(); ++channelI){
-	    // Create channel witn values		
-		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelI->first, 0))+"v ", i);
+	    // Create channel with values		
+		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelI->first, 0), setupVoltagesAccurcy["INTERNAL"][channelI->first])+"v ", i);
+		// Increment i
 		i++;
 	}
 
 	// Update external channel's moving average values
 	for (std::map<int, float>::iterator channelE=setupVoltages["EXTERNAL"].begin(); channelE!=setupVoltages["EXTERNAL"].end(); ++channelE){
 	    // Create channel witn values		
-		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelE->first, 1))+"v ", i);
+		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelE->first, 1), setupVoltagesAccurcy["EXTERNAL"][channelE->first])+"v ", i);
+		// Increment i
 		i++;
 	}
 }
@@ -125,22 +128,25 @@ void LcdUpdate()
 
 /**
  * HELPER Convert a float value to a string 
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-String FloatToString(float value)
+String FloatToString(float value, int accurcy)
 {
 	static char string[15];
-	dtostrf(value, 5, 3, string);
+	dtostrf(value, 5, accurcy, string);
 
 	return String(string);
 }
 
+
 /**
  * HELPER Convert a number into a letter
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-String numberToLetter(int n)
+String numberToLetter(int x)
 {
-    if(n >= 1 && n <= 26)
-		return String("abcdefghijklmnopqrstuvwxyz"[n-1]);
+    if(x >= 1 && x <= 26)
+		return String("abcdefghijklmnopqrstuvwxyz"[x-1]);
 
 	return "A";
 }

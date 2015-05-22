@@ -45,7 +45,6 @@ namespace VoltageConfiguration
 		voltage_config_container["INTERNAL"][2] = 200;
 		voltage_config_container["INTERNAL"][3] = 200;
 		voltage_config_container["INTERNAL"][4] = 200;
-		//voltage_config_container["INTERNAL"][5] = 200;
 		voltage_config_container["EXTERNAL"][0] = 200;
 		voltage_config_container["EXTERNAL"][1] = 4.096;
 		voltage_config_container["EXTERNAL"][2] = 200;
@@ -60,11 +59,37 @@ namespace VoltageConfiguration
 
 
 	/**
+	 * Setup voltage accurcy
+	 */
+	static std::map< String, std::map<int, int> > setupVoltagesAccurcy(  )
+	{
+		//Setup container
+		std::map< String, std::map<int, int> > voltage_config_container;
+
+		//Set channel with their voltages
+		voltage_config_container["INTERNAL"][1] = 1;
+		voltage_config_container["INTERNAL"][2] = 1;
+		voltage_config_container["INTERNAL"][3] = 1;
+		voltage_config_container["INTERNAL"][4] = 1;
+		voltage_config_container["EXTERNAL"][0] = 1;
+		voltage_config_container["EXTERNAL"][1] = 2;
+		voltage_config_container["EXTERNAL"][2] = 1;
+		voltage_config_container["EXTERNAL"][3] = 1;
+		voltage_config_container["EXTERNAL"][4] = 1;
+		voltage_config_container["EXTERNAL"][5] = 1;
+		voltage_config_container["EXTERNAL"][6] = 1;
+		voltage_config_container["EXTERNAL"][7] = 1;
+
+		return voltage_config_container;
+	}
+
+
+	/**
 	 * Setup moving average configurations
 	 */
 	static int setupMovingAverage(  )
 	{
-		return 5;
+		return 3;
 	}
 
 }
