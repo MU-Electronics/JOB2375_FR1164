@@ -205,8 +205,6 @@ bool ErrorController::lcdMessage(std::map<int, String> message, int direction)
 		// Init error LCD
 		::Lcd->errorCondition(message, direction, 0);
 	}
-	
-	
 	return true;
 }
 

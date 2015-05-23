@@ -45,8 +45,8 @@ namespace ErrorConfiguration
 		error_config_container["action_outputs"][33] = "HIGH";
 		error_config_container["action_outputs"][34] = "HIGH";
 		error_config_container["action_message"][0] = "Error: Internal interlocks";
-		error_config_container["action_message"][1] = "Please check encloser's panels are secure";
-		error_config_container["action_message"][2] = "";
+		error_config_container["action_message"][1] = "Check encloser's panels are secure and";
+		error_config_container["action_message"][2] = "in place correctly";
 		error_config_container["action_method"][0] = "0";
 		output.push_back(error_config_container);  error_config_container.clear();
 		
