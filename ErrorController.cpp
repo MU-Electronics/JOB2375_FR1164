@@ -35,6 +35,7 @@ ErrorController::ErrorController()
 			::pinMode(output->first, OUTPUT); 
 		}
 	}
+	errorSize=0;
 }
 
 
@@ -69,7 +70,7 @@ bool ErrorController::ensure(int id)
 		int val = ::digitalRead(condition->first); 
 
 		// Is condition is met OR not
-		if( (condition->second == "HIGH" && val == LOW) || (condition->second == "LOW" && val == HIGH)){
+		if( (condition->second == "HIGH" && val == HIGH) || (condition->second == "LOW" && val == LOW)){
 			if(std::find(triggeredErrorsNexted.begin(), triggeredErrorsNexted.end(), id) == triggeredErrorsNexted.end()){
 				// Add the id to the triggered errors
 				triggeredErrorsNexted.push_back(id);
@@ -79,8 +80,11 @@ bool ErrorController::ensure(int id)
 	
 	// Run relivent functions
 	if(std::find(triggeredErrorsNexted.begin(), triggeredErrorsNexted.end(), id) != triggeredErrorsNexted.end()){
-		triggeredErrors.push_back(id);
-		this->condtionFailed(id);
+		if(std::find(triggeredErrors.begin(), triggeredErrors.end(), id) == triggeredErrors.end()){
+			triggeredErrors.push_back(id);
+
+			this->condtionFailed(id);
+		}
 	}else if(std::find(triggeredErrors.begin(), triggeredErrors.end(), id) != triggeredErrors.end()){
 		triggeredErrors.resize(std::remove(triggeredErrors.begin(), triggeredErrors.end(), id) - triggeredErrors.begin());
 		this->condtionSuccess(id);
@@ -100,6 +104,7 @@ bool ErrorController::condtionSuccess(int id)
 {
 	// Set desired outputs
 	this->output(id, 2);
+	// Remove Lcd error message
 	this->lcdMessage(error_container[id]["action_message"], 0);
 	return false;
 }
@@ -176,7 +181,32 @@ bool ErrorController::runMethod(String method)
  */
 bool ErrorController::lcdMessage(std::map<int, String> message, int direction)
 {
-	::Lcd->errorCondition(message, direction);
+	// Has the number of errors changed?
+	if(triggeredErrors.size() != errorSize){
+		// Find number of errors
+		errorSize = triggeredErrors.size();  
+		if(errorSize != 0){
+			// Find the error with smallest ID (Piority of errors)
+			int* value = std::min_element(triggeredErrors.begin(), triggeredErrors.end());
+			// Set new messages for above error
+			message = error_container[*value]["action_message"];
+			// Set line three to show addtions errors
+			if(errorSize > 1)
+				message[3] = "+" + String(errorSize-1) + " error/s; Solve current to view.";
+			// Refresh LCD
+			::Lcd->errorCondition(message, direction, 1);
+		}else{
+			// Remove error
+			::Lcd->errorCondition(message, 0, 0);
+		}
+	}else{
+		// Remove error or not
+		if(errorSize == 0){ direction = 0; }
+		// Init error LCD
+		::Lcd->errorCondition(message, direction, 0);
+	}
+	
+	
 	return true;
 }
 

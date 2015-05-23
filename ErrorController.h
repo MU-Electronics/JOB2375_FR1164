@@ -19,6 +19,7 @@ private:
 	bool ensure(int id);
 	bool condtionFailed(int id);
 	bool condtionSuccess(int id);
+	int errorSize;
 protected:
 	std::vector< std::map< String, std::map<int, String> > > error_container;
 	std::vector<int> triggeredErrors;

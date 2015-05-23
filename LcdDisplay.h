@@ -32,6 +32,6 @@ class LcdDisplay
 		LiquidCrystal* lcd[2];
 		bool show(String toShow, int block);
 		bool clearBlock(int block);
-		bool errorCondition(std::map<int, String> message, int direction);
+		bool errorCondition(std::map<int, String> message, int direction, int forceRefresh);
 };
 

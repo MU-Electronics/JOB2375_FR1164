@@ -203,10 +203,10 @@ bool LcdDisplay::clearBlock(int block)
  * PUBLIC Puts LCD into error condition view
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-bool LcdDisplay::errorCondition(std::map<int, String> message, int direction)
+bool LcdDisplay::errorCondition(std::map<int, String> message, int direction, int forceRefresh)
 {
-	if(direction == 1){
-		if(errorEnabled != 1){
+	if(direction == 1 || forceRefresh == 1){
+		if(errorEnabled != 1 || forceRefresh == 1){
 			// Enable to error state
 			errorEnabled = 1;
 			// Clear display
