@@ -1,10 +1,10 @@
 #include <string>
 #include <map>
 #include <Arduino.h>
-#include "LcdDisplay.h"
+#include "LcdDriver.h"
 
 #pragma once
-extern LcdDisplay* Lcd;
+extern LcdDriver* Lcd;
 
 class ErrorController
 {

@@ -88,8 +88,10 @@ extern "C" void __cxa_pure_virtual() {;}
 #include <ErrorController.cpp>
 #include <ErrorController.h>
 #include <LcdConfiguration.cpp>
-#include <LcdDisplay.cpp>
-#include <LcdDisplay.h>
+#include <LcdController.cpp>
+#include <LcdController.h>
+#include <LcdDriver.cpp>
+#include <LcdDriver.h>
 #include <Voltage.cpp>
 #include <Voltage.h>
 #include <VoltageConfiguration.cpp>

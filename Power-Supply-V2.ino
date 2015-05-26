@@ -14,14 +14,15 @@
 #include <iterator>
 #include <memory>
 
-
+ 
 /**
  * Require internal project files
  */
-#include "LcdDisplay.h"
+#include "LcdDriver.h"
 #include "Voltage.h"
 #include "ErrorController.h"
 #include "VoltageConfiguration.cpp"
+#include "LcdController.h"
 
 
 /**
@@ -41,11 +42,13 @@ long updateEvery = 50;
  * Init singleton classes
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-LcdDisplay* Lcd = new LcdDisplay();
-
-//std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay());
+LcdDriver* Lcd = new LcdDriver();
+LcdController* LcdHandle = new LcdController();
 VoltageMeasure* Voltages = new VoltageMeasure();
 ErrorController* ErrorHandler = new ErrorController();
+
+//std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay());
+
 
 
 
@@ -58,6 +61,9 @@ void setup()
 {
 	// Setup serial communication
 	Serial.begin(9600);
+
+	// Update LCD
+	LcdHandle->init(setupVoltages, setupVoltagesAccurcy);
 }
 
 
@@ -78,45 +84,8 @@ void loop()
 	// Update Moving Voltage
 	Voltages->update(setupVoltages["INTERNAL"], setupVoltages["EXTERNAL"]);
 
-	// Only update LCD every set interval
-	unsigned long currentMillis = millis(); 
-	if(currentMillis - previousMillis > updateEvery) 
-	{
-		// Set lasted updated
-		previousMillis = currentMillis; 
-		// Update LCD
-		LcdUpdate();
-	}
-}
-
-
-
-
-
-/**
- * Update LCD Display
- * @author Sam Mottley sam.mottley@manchester.ac.uk
- */
-void LcdUpdate()
-{
-	// Set block
-	int i = 0;
-
-	// Update internal channel's moving average value
-	for (std::map<int, float>::iterator channelI=setupVoltages["INTERNAL"].begin(); channelI!=setupVoltages["INTERNAL"].end(); ++channelI){
-	    // Create channel with values		
-		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelI->first, 0), setupVoltagesAccurcy["INTERNAL"][channelI->first])+"v ", i);
-		// Increment i
-		i++;
-	}
-
-	// Update external channel's moving average values
-	for (std::map<int, float>::iterator channelE=setupVoltages["EXTERNAL"].begin(); channelE!=setupVoltages["EXTERNAL"].end(); ++channelE){
-	    // Create channel witn values		
-		Lcd->show("V"+numberToLetter(i+1)+":"+FloatToString(Voltages->get(channelE->first, 1), setupVoltagesAccurcy["EXTERNAL"][channelE->first])+"v ", i);
-		// Increment i
-		i++;
-	}
+	// Update LCD
+	LcdHandle->refresh(setupVoltages, setupVoltagesAccurcy);
 }
 
 
@@ -125,32 +94,6 @@ void LcdUpdate()
 
 
 
-
-
-/**
- * HELPER Convert a float value to a string 
- * @author Sam Mottley sam.mottley@manchester.ac.uk
- */
-String FloatToString(float value, int accurcy)
-{
-	static char string[15];
-	dtostrf(value, 5, accurcy, string);
-
-	return String(string);
-}
-
-
-/**
- * HELPER Convert a number into a letter
- * @author Sam Mottley sam.mottley@manchester.ac.uk
- */
-String numberToLetter(int x)
-{
-    if(x >= 1 && x <= 26)
-		return String("abcdefghijklmnopqrstuvwxyz"[x-1]);
-
-	return "A";
-}
 
 
 /*
