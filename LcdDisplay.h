@@ -2,8 +2,9 @@
  * Include Libraries 
  */
 #include "LiquidCrystal.h"
-#include "String.h"
+#include <Arduino.h>
 #include <map>
+#include <vector>
 
 
 
@@ -21,14 +22,11 @@ class LcdDisplay
 		bool setBlock(int block);
 		bool print(String string, int block);
 		int errorEnabled;
-		
+		std::vector< std::vector< int > > lcdSetup;
 	public:
-		//Set up LCD ID for blocks
-		int BLOCK_LCD_IDS[16];
-		//Set up LCD ID for blocks
-		int BLOCK_ROWS[16];
-		//Set up LCD ID for blocks
-		int BLOCK_COLS[16];
+		std::vector< int > BLOCK_LCD_IDS;
+		std::vector< int > BLOCK_ROWS;
+		std::vector< int > BLOCK_COLS;
 		LiquidCrystal* lcd[2];
 		bool show(String toShow, int block);
 		bool clearBlock(int block);

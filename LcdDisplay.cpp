@@ -1,10 +1,12 @@
 /**
  * Include libraries 
  */
-#include "LcdDisplay.h"
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <string>
+#include "LcdDisplay.h"
+#include "LcdConfiguration.cpp"
 
 
 
@@ -13,45 +15,31 @@
 /**
  * Set up 
  * @author Sam Mottley sam.mottley@manchester.ac.uk
+ * @ NOTE should really DI the settings
  */
 LcdDisplay::LcdDisplay(void)
 {
+	// Get Lcd setup data from configuration file
+	lcdSetup = LcdConfiguration::setupLcdDisplay();
+
 	//Setup Lcds
-	lcd[1] = new LiquidCrystal(27, 23, 30, 32, 34, 36);
-	lcd[2] = new LiquidCrystal(27, 25, 30, 32, 34, 36);	
+	std::vector< int > LcdOne = lcdSetup[0];
+	std::vector< int > LcdTwo = lcdSetup[1];
+	lcd[1] = new LiquidCrystal(LcdOne[0], LcdOne[1], LcdOne[2], LcdOne[3], LcdOne[4], LcdOne[5]);
+	lcd[2] = new LiquidCrystal(LcdTwo[0], LcdTwo[1], LcdTwo[2], LcdTwo[3], LcdTwo[4], LcdTwo[5]);	
 
 	// Set up the LCD's number of columns and rows: 
-    lcd[1]->begin(40, 2);
-    lcd[2]->begin(40, 2);
+	lcd[1]->begin(lcdSetup[2][0], lcdSetup[2][1]);
+    lcd[2]->begin(lcdSetup[2][0], lcdSetup[2][1]);
 
 	//Set LCD ids for blocks
-	int BLOCK_LCD_IDS [] = {
-		1,1,1,1,
-		1,1,1,1,
-		2,2,2,2,
-		2,2,2,2
-	};
+	this->BLOCK_LCD_IDS = lcdSetup[3];
 
 	//Set LCD row for blocks
-	int BLOCK_ROWS [] = {
-		0,0,0,0,
-		1,1,1,1,
-		0,0,0,0,
-		1,1,1,1
-	};
+	this->BLOCK_ROWS = lcdSetup[4];
 
 	//Set LCD col for blocks
-	int BLOCK_COLS [] = {
-		0,10,20,30,
-		0,10,20,30,
-		0,10,20,30,
-		0,7,14,30
-	};
-
-	//Assign the above block identifiers to class variables
-	std::copy(BLOCK_LCD_IDS, BLOCK_LCD_IDS + 16, this->BLOCK_LCD_IDS);
-	std::copy(BLOCK_ROWS, BLOCK_ROWS + 16, this->BLOCK_ROWS);
-	std::copy(BLOCK_COLS, BLOCK_COLS + 16, this->BLOCK_COLS);
+	this->BLOCK_COLS = lcdSetup[5];
 }
 
 

@@ -24,8 +24,8 @@ namespace ErrorConfiguration
 		// Setup Plug and Swicth               //
 		/////////////////////////////////////////
 		// Define sub containers
-		error_config_container["conditions"][52] = "LOW"; //When low throw error
-		error_config_container["conditions"][50] = "LOW"; //When low throw error
+		error_config_container["conditions"][52] = "HIGH"; //When HIGH throw error
+		error_config_container["conditions"][50] = "HIGH"; //When HIGH throw error
 		error_config_container["action_outputs"][46] = "HIGH";
 		error_config_container["action_outputs"][44] = "HIGH";
 		error_config_container["action_message"][0] = "ERROR: Plug and switch polarity";
@@ -40,8 +40,8 @@ namespace ErrorConfiguration
 		// Set up interlock switches           //
 		/////////////////////////////////////////
 		// Define sub containers
-		error_config_container["conditions"][40] = "LOW"; //When low throw error
-		error_config_container["conditions"][42] = "HIGH"; //When high throw error
+		error_config_container["conditions"][40] = "HIGH"; //When HIGH throw error
+		error_config_container["conditions"][42] = "HIGH"; //When HIGH throw error
 		error_config_container["action_outputs"][33] = "HIGH";
 		error_config_container["action_outputs"][34] = "HIGH";
 		error_config_container["action_message"][0] = "Error: Internal interlocks";
