@@ -31,9 +31,6 @@
  */
 std::map< String, std::map<int, float> > setupVoltages = VoltageConfiguration::setupVoltages();
 std::map< String, std::map<int, int> > setupVoltagesAccurcy = VoltageConfiguration::setupVoltagesAccurcy();
-long previousMillis = 0;
-long previousMillis2 = 0;
-long updateEvery = 50;
 
 
 
@@ -62,8 +59,21 @@ void setup()
 	// Setup serial communication
 	Serial.begin(9600);
 
-	// Update LCD
-	LcdHandle->init(setupVoltages, setupVoltagesAccurcy);
+	// Show welcome message
+	LcdHandle->welcome();
+
+	// Get some values into moving average for voltage readings
+	for(int i = 0; i>=4; i++)
+		Voltages->update(setupVoltages["INTERNAL"], setupVoltages["EXTERNAL"]);
+
+	// Wait for screen to be read
+	delay(10000);
+
+	// Clear LCD
+	Lcd->clearAll();
+
+	// Init voltages
+	LcdHandle->initVoltages(setupVoltages, setupVoltagesAccurcy);
 }
 
 
