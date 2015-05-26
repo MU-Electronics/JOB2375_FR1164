@@ -63,11 +63,11 @@ void setup()
 	LcdHandle->welcome();
 
 	// Get some values into moving average for voltage readings
-	for(int i = 0; i>=4; i++)
+	for(int i = 0; i<=10; i++)
 		Voltages->update(setupVoltages["INTERNAL"], setupVoltages["EXTERNAL"]);
 
 	// Wait for screen to be read
-	delay(10000);
+	delay(5000);
 
 	// Clear LCD
 	Lcd->clearAll();
@@ -106,8 +106,3 @@ void loop()
 
 
 
-/*
-Lcd->show("HV ON ", 12);
-Lcd->show("+MODE ", 13);
-Lcd->show("|| ERROR PLUGS POLARITY", 14);
-*/
