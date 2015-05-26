@@ -25,22 +25,31 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{e91be813-d1da-4cc3-b58c-817782aa24ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ErrorConfiguration.cpp">
-      <Filter>Error</Filter>
-    </ClCompile>
     <ClCompile Include="ErrorController.cpp">
       <Filter>Error</Filter>
     </ClCompile>
-    <ClCompile Include="LcdDisplay.cpp">
-      <Filter>Lcd</Filter>
-    </ClCompile>
-    <ClCompile Include="VoltageConfiguration.cpp">
-      <Filter>Voltage</Filter>
-    </ClCompile>
     <ClCompile Include="Voltage.cpp">
       <Filter>Voltage</Filter>
+    </ClCompile>
+    <ClCompile Include="LcdDriver.cpp">
+      <Filter>Lcd</Filter>
+    </ClCompile>
+    <ClCompile Include="LcdController.cpp">
+      <Filter>Lcd</Filter>
+    </ClCompile>
+    <ClCompile Include="ErrorConfiguration.cpp">
+      <Filter>Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="LcdConfiguration.cpp">
+      <Filter>Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="VoltageConfiguration.cpp">
+      <Filter>Configuration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -53,11 +62,14 @@
     <ClInclude Include="Voltage.h">
       <Filter>Voltage</Filter>
     </ClInclude>
-    <ClInclude Include="LcdDisplay.h">
-      <Filter>Lcd</Filter>
-    </ClInclude>
     <ClInclude Include="ErrorController.h">
       <Filter>Error</Filter>
+    </ClInclude>
+    <ClInclude Include="LcdDriver.h">
+      <Filter>Lcd</Filter>
+    </ClInclude>
+    <ClInclude Include="LcdController.h">
+      <Filter>Lcd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
