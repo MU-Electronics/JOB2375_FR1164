@@ -11,7 +11,7 @@
 
 
 #pragma once
-
+// This should really be DI'ed
 extern VoltageMeasure* Voltages;
 
 class LcdDriver

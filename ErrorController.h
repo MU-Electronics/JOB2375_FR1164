@@ -4,6 +4,7 @@
 #include "LcdDriver.h"
 
 #pragma once
+// This should really be DI'ed
 extern LcdDriver* Lcd;
 
 class ErrorController

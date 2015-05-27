@@ -7,7 +7,7 @@
 
 
 #pragma once
-
+// These should really be DI'ed
 extern LcdDriver* Lcd;
 extern VoltageMeasure* Voltages;
 

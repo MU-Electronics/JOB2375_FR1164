@@ -36,15 +36,15 @@ std::map< String, std::map<int, int> > setupVoltagesAccurcy = VoltageConfigurati
 
 
 /**
- * Init singleton classes
+ * Init classes
  * @author Sam Mottley sam.mottley@manchester.ac.uk
+ * @note The below should really be contained with an container
  */
 LcdDriver* Lcd = new LcdDriver();
 LcdController* LcdHandle = new LcdController();
 VoltageMeasure* Voltages = new VoltageMeasure();
 ErrorController* ErrorHandler = new ErrorController();
-
-//std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay());
+//std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay()); << This format should be used for the above but ardunio no like atm
 
 
 
