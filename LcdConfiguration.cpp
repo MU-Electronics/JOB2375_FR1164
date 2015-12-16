@@ -96,7 +96,7 @@ namespace LcdConfiguration
 		 std::map< int, String > welcome;
 
 		// Line one
-		welcome[0] = "Electron Gun Suply";
+		welcome[0] = "Electron Gun Supply";
 
 		// Line two
 		welcome[4] = "Setting up system... Please wait";

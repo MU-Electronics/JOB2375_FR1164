@@ -28,6 +28,7 @@ protected:
 	std::map< String, std::map<int, float> > voltages;
 	std::map< String, std::map<int, int> > voltagesAccurcy;
 	std::map< String, std::map<int, float> > voltagesJitter;
+	std::map< int, int > VoltageBlocks;
 	String floatToStringss(float value, int accurcy);
 	String numberToLetter(int x);
 };

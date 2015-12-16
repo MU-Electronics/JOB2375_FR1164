@@ -23,6 +23,7 @@ LcdController::LcdController()
 	previousMillis = 0;
 	refreshRate = LcdConfiguration::refreshRate();
 	voltagesJitter = VoltageConfiguration::setupVoltagesJitter();
+	VoltageBlocks = VoltageConfiguration::setupVoltagesBlock();
 }
 
 
@@ -87,7 +88,7 @@ int LcdController::refresh(std::map< String, std::map<int, float> > setupVoltage
 		previousMillis = currentMillis; 
 		
 		// Set block
-		int i = 0;
+		int i = 1;
 
 		//Set voltages and accurcy
 		voltages = setupVoltages;
@@ -95,7 +96,7 @@ int LcdController::refresh(std::map< String, std::map<int, float> > setupVoltage
 
 		// Update internal channel's moving average value
 		for (std::map<int, float>::iterator channelI=voltages["INTERNAL"].begin(); channelI!=voltages["INTERNAL"].end(); ++channelI){
-			this->update(channelI->first, 1, i);
+			this->update(channelI->first, 1, VoltageBlocks[i] - 1);
 			// Increment i
 			i++;
 		}
@@ -103,7 +104,7 @@ int LcdController::refresh(std::map< String, std::map<int, float> > setupVoltage
 		// Update external channel's moving average values
 		for (std::map<int, float>::iterator channelE=voltages["EXTERNAL"].begin(); channelE!=voltages["EXTERNAL"].end(); ++channelE){
 			// Create channel witn values		
-			this->update(channelE->first, 2, i);
+			this->update(channelE->first, 2, VoltageBlocks[i] - 1);
 			// Increment i
 			i++;
 		}
