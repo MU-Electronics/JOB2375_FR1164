@@ -1,11 +1,11 @@
 #include <string>
 #include <map>
 #include <Arduino.h>
-#include "LcdDriver.h"
+#include "LcdController.h"
 
 #pragma once
 // This should really be DI'ed
-extern LcdDriver* Lcd;
+extern LcdController* LcdHandle;
 
 class ErrorController
 {

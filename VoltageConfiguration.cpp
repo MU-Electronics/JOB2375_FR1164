@@ -41,10 +41,10 @@ namespace VoltageConfiguration
 		std::map< String, std::map<int, float> > voltage_config_container;
 
 		//Set channel with their voltages
+		voltage_config_container["INTERNAL"][0] = 100;
 		voltage_config_container["INTERNAL"][1] = 100;
 		voltage_config_container["INTERNAL"][2] = 100;
 		voltage_config_container["INTERNAL"][3] = 100;
-		voltage_config_container["INTERNAL"][4] = 100;
 		voltage_config_container["EXTERNAL"][0] = 100;
 		voltage_config_container["EXTERNAL"][1] = 100;
 		voltage_config_container["EXTERNAL"][2] = 100;
@@ -67,20 +67,20 @@ namespace VoltageConfiguration
 
 		//Set voltage block postions (External then internal)
 			//Internal
-			blocks[1] = 5; 
-			blocks[2] = 2; 
-			blocks[3] = 3; 
-			blocks[4] = 4;
+			blocks[1] = 9; 
+			blocks[2] = 10; 
+			blocks[3] = 11; 
+			blocks[4] = 12;
 
 			//External
 			blocks[5] = 1;
-			blocks[6] = 6; 
-			blocks[7] = 7; 
-			blocks[8] = 8; 
-			blocks[9] = 9; 
-			blocks[10] = 10; 
-			blocks[11] = 11; 
-			blocks[12] = 12; 
+			blocks[6] = 2; 
+			blocks[7] = 3; 
+			blocks[8] = 4; 
+			blocks[9] = 5; 
+			blocks[10] = 6; 
+			blocks[11] = 7; 
+			blocks[12] = 8; 
 
 		return blocks;
 	}
@@ -94,10 +94,10 @@ namespace VoltageConfiguration
 		std::map< String, std::map<int, int> > voltage_config_container;
 
 		//Set channel with their voltages
+		voltage_config_container["INTERNAL"][0] = 1;
 		voltage_config_container["INTERNAL"][1] = 1;
 		voltage_config_container["INTERNAL"][2] = 1;
 		voltage_config_container["INTERNAL"][3] = 1;
-		voltage_config_container["INTERNAL"][4] = 1;
 		voltage_config_container["EXTERNAL"][0] = 1;
 		voltage_config_container["EXTERNAL"][1] = 1;
 		voltage_config_container["EXTERNAL"][2] = 1;

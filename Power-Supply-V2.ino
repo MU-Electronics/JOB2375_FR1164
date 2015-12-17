@@ -95,7 +95,7 @@ void loop()
 	Voltages->update(setupVoltages["INTERNAL"], setupVoltages["EXTERNAL"]);
 
 	// Update LCD
-	LcdHandle->refresh(setupVoltages, setupVoltagesAccurcy);
+	LcdHandle->refresh(setupVoltages, setupVoltagesAccurcy, false);
 }
 
 

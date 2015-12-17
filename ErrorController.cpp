@@ -194,16 +194,16 @@ bool ErrorController::lcdMessage(std::map<int, String> message, int direction)
 			if(errorSize > 1)
 				message[3] = "+" + String(errorSize-1) + " error/s; Solve current to view.";
 			// Refresh LCD
-			::Lcd->errorCondition(message, direction, 1);
+			::LcdHandle->errorCondition(message, direction, 1);
 		}else{
 			// Remove error
-			::Lcd->errorCondition(message, 0, 0);
+			::LcdHandle->errorCondition(message, 0, 0);
 		}
 	}else{
 		// Remove error or not
 		if(errorSize == 0){ direction = 0; }
 		// Init error LCD
-		::Lcd->errorCondition(message, direction, 0);
+		::LcdHandle->errorCondition(message, direction, 0);
 	}
 	return true;
 }

@@ -77,36 +77,40 @@ String LcdController::numberToLetter(int x)
  * PUBLIC Check all voltages that need to be updated and updated them
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-int LcdController::refresh(std::map< String, std::map<int, float> > setupVoltages, std::map< String, std::map<int, int> > setupVoltagesAccurcy)
+int LcdController::refresh(std::map< String, std::map<int, float> > setupVoltages, std::map< String, std::map<int, int> > setupVoltagesAccurcy, bool forcefull)
 {
 
 	// Only update LCD every set interval
 	unsigned long currentMillis = millis(); 
 	if(currentMillis - previousMillis > refreshRate) 
 	{
-		// Set lasted updated
-		previousMillis = currentMillis; 
+		// Check error mode is not enabled
+		if(errorEnabled != 1 || forcefull == true)
+		{
+			// Set lasted updated
+			previousMillis = currentMillis; 
 		
-		// Set block
-		int i = 1;
+			// Set block
+			int i = 1;
 
-		//Set voltages and accurcy
-		voltages = setupVoltages;
-		voltagesAccurcy = setupVoltagesAccurcy;
+			//Set voltages and accurcy
+			voltages = setupVoltages;
+			voltagesAccurcy = setupVoltagesAccurcy;
 
-		// Update internal channel's moving average value
-		for (std::map<int, float>::iterator channelI=voltages["INTERNAL"].begin(); channelI!=voltages["INTERNAL"].end(); ++channelI){
-			this->update(channelI->first, 1, VoltageBlocks[i] - 1);
-			// Increment i
-			i++;
-		}
+			// Update internal channel's moving average value
+			for (std::map<int, float>::iterator channelI=voltages["INTERNAL"].begin(); channelI!=voltages["INTERNAL"].end(); ++channelI){
+				this->update(channelI->first, 1, VoltageBlocks[i] - 1, forcefull);
+				// Increment i
+				i++;
+			}
 
-		// Update external channel's moving average values
-		for (std::map<int, float>::iterator channelE=voltages["EXTERNAL"].begin(); channelE!=voltages["EXTERNAL"].end(); ++channelE){
-			// Create channel witn values		
-			this->update(channelE->first, 2, VoltageBlocks[i] - 1);
-			// Increment i
-			i++;
+			// Update external channel's moving average values
+			for (std::map<int, float>::iterator channelE=voltages["EXTERNAL"].begin(); channelE!=voltages["EXTERNAL"].end(); ++channelE){
+				// Create channel witn values		
+				this->update(channelE->first, 2, VoltageBlocks[i] - 1, forcefull);
+				// Increment i
+				i++;
+			}
 		}
 	}
 }
@@ -116,7 +120,7 @@ int LcdController::refresh(std::map< String, std::map<int, float> > setupVoltage
  * PUBLIC update the display if the new voltage is different from the pervious
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-int LcdController::update(int channel, int type, int id)
+int LcdController::update(int channel, int type, int id, bool forcefull)
 {
 	String types; int typen;
 	if(type == 1) { types = "INTERNAL"; typen = 0; }else{ types = "EXTERNAL"; typen=1; }
@@ -130,7 +134,7 @@ int LcdController::update(int channel, int type, int id)
 	
 
 	//If voltage has chnaged update
-	if(difference > voltagesJitter[types][channel] || lastUpdated[types].find(channel)  == lastUpdated[types].end())
+	if(difference > voltagesJitter[types][channel] || lastUpdated[types].find(channel)  == lastUpdated[types].end() || forcefull == true)
 	{
 		// Create channel with values		
 		Lcd->show("V"+this->numberToLetter(id+1)+":"+voltage+"v ", id);
@@ -196,4 +200,33 @@ bool LcdController::messageBar()
 	Lcd->show("|| ERROR PLUGS POLARITY", 14);
 	*/
 	return false;
+}
+
+
+/**
+ * PUBLIC Puts LCD into error condition view
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ */
+bool LcdController::errorCondition(std::map<int, String> message, int direction, int forceRefresh)
+{
+	if(direction == 1 || forceRefresh == 1){
+		if(errorEnabled != 1 || forceRefresh == 1){
+			// Enable to error state
+			errorEnabled = 1;
+			// Clear display
+			Lcd->clearAll();
+			// Show messages
+			Lcd->showRow(message[0], 1);
+			Lcd->showRow(message[1], 2);
+			Lcd->showRow(message[2], 3);
+			Lcd->showRow(message[3], 4);
+		}
+	}else{
+		// Disable to error state
+		errorEnabled = 0;
+		// Clear display
+		Lcd->clearAll();
+		//Re show voltage
+		this->refresh(VoltageConfiguration::setupVoltages(), VoltageConfiguration::setupVoltagesAccurcy(), true);
+	}
 }

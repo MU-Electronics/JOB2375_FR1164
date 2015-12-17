@@ -9,7 +9,6 @@
 
 
 
-
 #pragma once
 // This should really be DI'ed
 extern VoltageMeasure* Voltages;
@@ -25,7 +24,6 @@ class LcdDriver
 		bool move(int lcdId, int x, int y);
 		bool setBlock(int block);
 		bool print(String string, int block);
-		int errorEnabled;
 		std::vector< std::vector< int > > lcdSetup;
 	public:
 		std::vector< int > BLOCK_LCD_IDS;
@@ -34,7 +32,7 @@ class LcdDriver
 		LiquidCrystal* lcd[2];
 		bool show(String toShow, int block);
 		bool clearBlock(int block);
-		bool errorCondition(std::map<int, String> message, int direction, int forceRefresh);
 		bool clearAll();
+		bool showRow(String toShow, int row);
 };
 

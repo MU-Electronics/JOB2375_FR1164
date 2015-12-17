@@ -7,7 +7,7 @@
 #include <string>
 #include "LcdDriver.h"
 #include "LcdConfiguration.cpp"
-
+#include "VoltageConfiguration.cpp"
 
 
 
@@ -137,23 +137,47 @@ bool LcdDriver::print(String string, int block)
  */
 bool LcdDriver::show(String toShow, int block)
 {
-	// Is system in error mode?
-	if(errorEnabled != 1){
-		// Set block
-		bool blockSet = this->setBlock(block);
 
-		// If block set successfully 
-		if(blockSet)
-		{
-			// Show string
-			if(this->print(toShow, block))	
-				return true;
-		}
+	// Set block
+	bool blockSet = this->setBlock(block);
+
+	// If block set successfully 
+	if(blockSet)
+	{
+		// Show string
+		if(this->print(toShow, block))	
+			return true;
 	}
+	
 	
 	// Something went wrong throw exception??
 	return false;
 }
+
+
+/**
+ * PUBLIC Show a string on row
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ */
+bool LcdDriver::showRow(String toShow, int row)
+{
+	// Set lcd id
+	int lcdId = 1;
+	if(row >= 3){
+		lcdId = 2;
+		row = row - 2;
+	}
+
+	// Set row
+	this->move(lcdId, 0, row-1);
+
+
+	// Show string
+	if(this->lcd[lcdId]->print(toShow))	
+		return true;
+		
+}
+
 
 /**
  * PUBLIC Clear a block of its content
@@ -197,31 +221,3 @@ bool LcdDriver::clearAll()
 	return true;
 }
 
-
-/**
- * PUBLIC Puts LCD into error condition view
- * @author Sam Mottley sam.mottley@manchester.ac.uk
- */
-bool LcdDriver::errorCondition(std::map<int, String> message, int direction, int forceRefresh)
-{
-	if(direction == 1 || forceRefresh == 1){
-		if(errorEnabled != 1 || forceRefresh == 1){
-			// Enable to error state
-			errorEnabled = 1;
-			// Clear display
-			this->lcd[1]->clear();
-			this->lcd[2]->clear();
-			// Show message
-			this->move(1, 0, 0); this->lcd[1]->print(message[0]);
-			this->move(1, 0, 1); this->lcd[1]->print(message[1]);
-			this->move(2, 0, 0); this->lcd[2]->print(message[2]);
-			this->move(2, 0, 1); this->lcd[2]->print(message[3]);
-		}
-	}else{
-		// Disable to error state
-		errorEnabled = 0;
-		// Clear display
-		this->lcd[1]->clear();
-		this->lcd[2]->clear();
-	}
-}
