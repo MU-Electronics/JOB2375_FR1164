@@ -47,6 +47,10 @@ bool error = false;
 bool errorSet = false;
 bool errorSet2 = false;
 bool errorSet3 = false;
+bool errorSet4 = false;
+bool errorSet5 = false;
+bool errorSet6 = false;
+bool errorSet7 = false;
 int prevModeState = 0;
 //ErrorController* ErrorHandler = new ErrorController();
 //std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay()); << This format should be used for the above but ardunio no like atm
@@ -123,12 +127,22 @@ bool errors()
 	pinMode(48, INPUT);
 	if(digitalRead(48) == HIGH)
 	{
-		if(errorSet == false){
+		if((digitalRead(46) == LOW && digitalRead(44) == HIGH ) || (digitalRead(46) == HIGH && digitalRead(44) == LOW )){
+			Serial.println("on");
+			if(errorSet == false){
+				pinMode(31, OUTPUT);
+				digitalWrite(31, LOW);
+				errorSet = true;
+				LcdHandle->errorCondition("Please turn on the HV power to procced", "or select the relivent mode (-/+)", "", "For help contact the electronics section", 1, 1, 1);
+				return false;
+			}
+			errorSet4 = false;
+		}else if(errorSet4 == false){
 			pinMode(31, OUTPUT);
 			digitalWrite(31, LOW);
-			errorSet = true;
-			LcdHandle->errorCondition("Please turn on the HV power to procced", "or select the relivent mode (-/+)", "", "For help contact the electronics section", 1, 1, 1);
-			return false;
+			errorSet4 = true;
+			errorSet = false;
+			LcdHandle->errorCondition("Please check the plug configuration", "", "", "", 1, 1, 1);
 		}
 	}else if(errorSet == true){
 		pinMode(31, OUTPUT);
@@ -163,32 +177,43 @@ bool errors()
 		digitalWrite(29, HIGH);
 		prevModeState = HIGH;
 		if(errorSet3 == true){
-			LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
+			//LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 			errorSet3 = false;
+			errorSet = false;
 		}
 	}else if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(44) == LOW){
 		pinMode(29, OUTPUT);
 		digitalWrite(29, LOW);
 		prevModeState = LOW;
 		if(errorSet3 == true){
-			LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
+			//LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 			errorSet3 = false;
+			errorSet = false;
 		}
-	}else if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(46) == HIGH && digitalRead(44) == LOW){
+	}else if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(46) == HIGH && digitalRead(44) == LOW){
+		// ERROR PLUG POLATITY
+		if(errorSet3 == false){
+			LcdHandle->errorCondition("Plug wrongs", "", "", "", 1, 1, 1);
+			errorSet3 = true;
+		}
+	}else if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(44) == HIGH && digitalRead(46) == LOW){
 		// ERROR PLUG POLATITY
 		if(errorSet3 == false){
 			LcdHandle->errorCondition("Plug wrong", "", "", "", 1, 1, 1);
 			errorSet3 = true;
 		}
-	}else if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(44) == HIGH && digitalRead(46) == LOW){
-		// ERROR PLUG POLATITY
-		if(errorSet3 == false){
-			LcdHandle->errorCondition("Plug wrong", "", "", "", 1, 1, 1);
-			errorSet3 = true;
-		}
+	}else{
+		errorSet3 = false;
 	}
 
-
+	/* Ensure not on when plugs are not in
+	if(digitalRead(46) == HIGH && digitalRead(44) == HIGH){
+		pinMode(31, OUTPUT);
+		digitalWrite(31, LOW);
+		errorSet5 = true;
+		LcdHandle->errorCondition("Please insert rear plugs", "", "", "", 1, 1, 1);
+		Serial.println("off");
+	}*/
 
 	return true;
 }
