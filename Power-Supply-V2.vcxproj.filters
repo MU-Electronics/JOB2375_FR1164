@@ -53,9 +53,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Visual Micro\.Power-Supply-V2.vsarduino.h">
-      <Filter>Miscellaneous\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Visual Micro\.JOB2375_FR1164.vsarduino.h">
       <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
@@ -70,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="LcdController.h">
       <Filter>Lcd</Filter>
+    </ClInclude>
+    <ClInclude Include="__vm\.Power-Supply-V2.vsarduino.h">
+      <Filter>Miscellaneous\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

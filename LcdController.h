@@ -21,7 +21,7 @@ public:
 	int initVoltages(std::map< String, std::map<int, float> > setupVoltages, std::map< String, std::map<int, int> > setupVoltagesAccurcy);
 	void welcome();
 	bool messageBar();
-	bool errorCondition(std::map<int, String> message, int direction, int forceRefresh);
+	bool errorCondition(char row1[], char row2[], char row3[], char row4[], int totalErrors, int direction, int forceRefresh);
 protected:
 	unsigned long previousMillis; 
 	int refreshRate;

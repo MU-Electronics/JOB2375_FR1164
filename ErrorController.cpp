@@ -22,7 +22,8 @@ ErrorController::ErrorController()
 	error_container = ErrorConfiguration::setupErrors();
 
 	//Setup outputs and inputs
-	for(int i = 0; i < error_container.size(); i++){
+	int o = error_container.size();
+	for(int i = 0; i < o; i++){
 		// Set inputs
 		for (std::map<int, String>::iterator input=error_container[i]["conditions"].begin(); input!=error_container[i]["conditions"].end(); ++input){
 			// Get value of input
@@ -35,7 +36,8 @@ ErrorController::ErrorController()
 			::pinMode(output->first, OUTPUT); 
 		}
 	}
-	errorSize=0;
+
+	displayed_error = -1;
 }
 
 
@@ -61,36 +63,39 @@ ErrorController::~ErrorController(void)
 bool ErrorController::ensure(int id)
 {
 	// Get the condition settings
-	std::map<int, String> conditions = error_container[id]["conditions"];
-	std::vector<int> triggeredErrorsNexted;
+	//std::map<int, String> conditions = error_container[id]["conditions"];
+	std::map<int, int> triggeredErrorsNexted;
 
 	//Loop though the error conditions that should not be meet
-	for (std::map<int, String>::iterator condition=conditions.begin(); condition!=conditions.end(); ++condition){
+	for (std::map<int, String>::iterator condition=error_container[id]["conditions"].begin(); condition!=error_container[id]["conditions"].end(); ++condition)
+	{
 		// Get value of input
 		int val = ::digitalRead(condition->first); 
 
-		// Is condition is met OR not
+		// Error for high and low
 		if( (condition->second == "HIGH" && val == HIGH) || (condition->second == "LOW" && val == LOW)){
-			if(std::find(triggeredErrorsNexted.begin(), triggeredErrorsNexted.end(), id) == triggeredErrorsNexted.end()){
-				// Add the id to the triggered errors
-				triggeredErrorsNexted.push_back(id);
-			}
+			if( triggeredErrorsNexted.find(id) == triggeredErrorsNexted.end() ){ triggeredErrorsNexted[id] = 1; }else{ triggeredErrorsNexted[id] = triggeredErrorsNexted[id] + 1; }
+		}
+		
+		// Error for switched state
+		if(condition->second == "CHANGE" && outputChanges[id] != val){
+			//triggeredErrorsNexted[id]++;
 		}
 	}
 	
-	// Run relivent functions
-	if(std::find(triggeredErrorsNexted.begin(), triggeredErrorsNexted.end(), id) != triggeredErrorsNexted.end()){
-		if(std::find(triggeredErrors.begin(), triggeredErrors.end(), id) == triggeredErrors.end()){
-			triggeredErrors.push_back(id);
+	
+	bool met = false;
+	// Are there any triggered condtions
+	if( triggeredErrorsNexted.find(id) != triggeredErrorsNexted.end() ){
+		// All condtions are triggered
+		int c = error_container[id]["conditions"].size();
+		if(triggeredErrorsNexted[id] == c){
+			met = true;
+		}
+	}
 
-			this->condtionFailed(id);
-		}
-	}else if(std::find(triggeredErrors.begin(), triggeredErrors.end(), id) != triggeredErrors.end()){
-		triggeredErrors.resize(std::remove(triggeredErrors.begin(), triggeredErrors.end(), id) - triggeredErrors.begin());
-		this->condtionSuccess(id);
-	}
+	return met;
 	
-	return false;
 }
 
 
@@ -100,13 +105,12 @@ bool ErrorController::ensure(int id)
  *
  * @pram id ID of the error condition
  */
-bool ErrorController::condtionSuccess(int id)
+bool ErrorController::condtionsNotMet(int id, bool lcd)
 {
 	// Set desired outputs
 	this->output(id, 2);
-	// Remove Lcd error message
-	this->lcdMessage(error_container[id]["action_message"], 0);
-	return false;
+
+	return true;
 }
 
 
@@ -116,12 +120,11 @@ bool ErrorController::condtionSuccess(int id)
  *
  * @pram id ID of the error condition
  */
-bool ErrorController::condtionFailed(int id)
+bool ErrorController::conditionsMet(int id, bool lcd)
 {
-	// Set desired outputs
+	// Set desired outputs for met condtions 
 	this->output(id, 1);
-	// Set disired lcd message
-	this->lcdMessage(error_container[id]["action_message"], 1);
+
 	return true;
 }
 
@@ -138,11 +141,11 @@ bool ErrorController::output(int id, int direction)
 	// Is this behavour required?
 	if (error_container[id].find("action_outputs") != error_container[id].end() ){
 		// The the actions required
-		std::map<int, String> actionoutputs = error_container[id]["action_outputs"];
-
-		for (std::map<int, String>::iterator output=actionoutputs.begin(); output!=actionoutputs.end(); ++output){
+		//std::map<int, String> actionoutputs = error_container[id]["action_outputs"];
+		for (std::map<int, String>::iterator output=error_container[id]["action_outputs"].begin(); output!=error_container[id]["action_outputs"].end(); ++output){
 			// Double check pin is output
 			::pinMode(output->first, OUTPUT); 
+						//outputChanges[output->first] = output->second;
 
 			//Decide the output
 			if(output->second == "HIGH" && direction == 1){
@@ -153,8 +156,14 @@ bool ErrorController::output(int id, int direction)
 				::digitalWrite(output->first, LOW); 
 			}else if(output->second == "LOW" && direction == 2){
 				::digitalWrite(output->first, HIGH);
+			}else if(output->second == "LOW_L" && direction == 2){
+				::digitalWrite(output->first, LOW); 
+				outputChanges[output->first] = 0;
+			}else if(output->second == "HIGH_L" && direction == 2){
+				::digitalWrite(output->first, HIGH); 
+				outputChanges[output->first] = 1;
 			}else{
-				::digitalWrite(output->first, LOW);
+				//::digitalWrite(output->first, LOW);
 			}
 		}
 	}
@@ -179,36 +188,37 @@ bool ErrorController::runMethod(String method)
  *
  * @pram message Message to be wrote to LCD screen
  */
-bool ErrorController::lcdMessage(std::map<int, String> message, int direction)
+bool ErrorController::lcdError(int id, int totalErrors)
 {
-	// Has the number of errors changed?
-	if(triggeredErrors.size() != errorSize){
-		// Find number of errors
-		errorSize = triggeredErrors.size();  
-		if(errorSize != 0){
-			// Find the error with smallest ID (Piority of errors)
-			int* value = std::min_element(triggeredErrors.begin(), triggeredErrors.end());
-			// Set new messages for above error
-			message = error_container[*value]["action_message"];
+	// Has the error message changed?
+	if(displayed_error == -1 || displayed_error != id){
+		displayed_error = id;
+		// Check there are errors that required lcd message
+		//if(error_container[id]["type"][0] != "3"){
+		
 			// Set line three to show addtions errors
-			if(errorSize > 1)
-				message[3] = "+" + String(errorSize-1) + " error/s; Solve current to view.";
+			//if(totalErrors > 1 && error_container[id]["type"][0] == "2")
+				//error_container[id]["action_message"][3] = "+" + String(totalErrors-1) + " error/s; Solve current to view.";
+
 			// Refresh LCD
-			::LcdHandle->errorCondition(message, direction, 1);
-		}else{
-			// Remove error
-			::LcdHandle->errorCondition(message, 0, 0);
-		}
-	}else{
-		// Remove error or not
-		if(errorSize == 0){ direction = 0; }
-		// Init error LCD
-		::LcdHandle->errorCondition(message, direction, 0);
+			//LcdHandle->errorCondition(id,totalErrors,1, 1);
+
+			//lcd_error_on = true;
+		//}
 	}
+
 	return true;
 }
 
 
+bool ErrorController::lcdErrorClear(){
+	// Clear error
+	//LcdHandle->errorCondition(0, 0);
+
+	lcd_error_on = false;
+
+	return true;
+}
 
 
 
@@ -220,11 +230,22 @@ bool ErrorController::lcdMessage(std::map<int, String> message, int direction)
  */
 bool ErrorController::check()
 {
-	// @todo Run one condition for now, loop though all in end
-	// Loop though error condtions
-	for(int i = 0; i < error_container.size(); i++){
-		this->ensure(i);
+	// Loop though error condtions and get the trigged condtions ids
+	std::map<int, int> triggered;
+	int triggered_id;
+	int c = error_container.size();
+	for(int i = 0; i < c; i++){
+		triggered_id = this->ensure(i);
+		if(triggered_id == 1)
+			triggered[i] = triggered_id;
 	}
-
-	return false;
+	::Serial.println("hellow");
+	// If there is an error
+	if(!triggered.empty()){
+		this->lcdError(triggered[0], triggered.size());
+	}else if(lcd_error_on == true){
+		this->lcdErrorClear();
+	}
+	::Serial.println("hellow");
+	return true;
 }

@@ -7,7 +7,7 @@
 #include <Arduino.h>
 #include "LcdConfiguration.cpp"
 #include "VoltageConfiguration.cpp"
-
+#include "ErrorConfiguration.cpp"
 
 
 
@@ -207,7 +207,7 @@ bool LcdController::messageBar()
  * PUBLIC Puts LCD into error condition view
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  */
-bool LcdController::errorCondition(std::map<int, String> message, int direction, int forceRefresh)
+bool LcdController::errorCondition(char row1[], char row2[], char row3[], char row4[], int totalErrors,int direction, int forceRefresh)
 {
 	if(direction == 1 || forceRefresh == 1){
 		if(errorEnabled != 1 || forceRefresh == 1){
@@ -216,17 +216,17 @@ bool LcdController::errorCondition(std::map<int, String> message, int direction,
 			// Clear display
 			Lcd->clearAll();
 			// Show messages
-			Lcd->showRow(message[0], 1);
-			Lcd->showRow(message[1], 2);
-			Lcd->showRow(message[2], 3);
-			Lcd->showRow(message[3], 4);
+			Lcd->showRow(row1, 1);
+			Lcd->showRow(row2, 2);
+			Lcd->showRow(row3, 3);
+			Lcd->showRow(row4, 4);
 		}
 	}else{
 		// Disable to error state
 		errorEnabled = 0;
 		// Clear display
 		Lcd->clearAll();
-		//Re show voltage
+		// Re show voltage
 		this->refresh(VoltageConfiguration::setupVoltages(), VoltageConfiguration::setupVoltagesAccurcy(), true);
 	}
 }
