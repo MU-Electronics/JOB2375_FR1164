@@ -75,8 +75,8 @@ void setup()
 	for(int i = 0; i<=10; i++)
 		Voltages->update(setupVoltages["INTERNAL"], setupVoltages["EXTERNAL"]);
 
-	// Wait for screen to be read
-	//delay(5000);
+	// Ensure HV switch is off
+	setupErrors();
 
 	// Clear LCD
 	Lcd->clearAll();
@@ -121,6 +121,22 @@ void loop()
  * C only functions / varables. Therefore nothing fancy can be achived like the configuration used for 
  * the other aspects of this program
  */
+bool setupErrors()
+{
+	pinMode(48, INPUT);
+	if(digitalRead(48) == LOW)
+	{
+		bool i = false;
+		bool first = true;
+		while(!i){
+			if(first){ LcdHandle->errorCondition("Please place the HV power switch to the", "off postion to proccedd", "", "For help contact the electronics section", 1, 1, 1); first = false; };
+			if(digitalRead(48) == HIGH)
+				i = true;
+		}
+	}
+}
+
+
 bool errors()
 {
 	//Perfrom the power siwtch check
@@ -156,6 +172,10 @@ bool errors()
 	pinMode(50, INPUT);
 	pinMode(48, INPUT);
 	if(digitalRead(48) == LOW && digitalRead(50) != prevModeState){
+		Serial.print(digitalRead(50));
+		Serial.print(" != ");
+		Serial.println(prevModeState);
+
 		if(errorSet2 == false){
 			errorSet2 = true;
 			LcdHandle->errorCondition("Do not change mode with HV on", "", "", "", 1, 1, 1);
@@ -172,19 +192,19 @@ bool errors()
 	pinMode(48, INPUT);
 	pinMode(46, INPUT);
 	pinMode(44, INPUT);
-	if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(46) == LOW){
+	if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(46) == LOW){ //&& digitalRead(46) == LOW
 		pinMode(29, OUTPUT);
 		digitalWrite(29, HIGH);
-		prevModeState = HIGH;
+		prevModeState = LOW;
 		if(errorSet3 == true){
 			//LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 			errorSet3 = false;
 			errorSet = false;
 		}
-	}else if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(44) == LOW){
+	}else if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(44) == LOW){ //&& digitalRead(44) == LOW
 		pinMode(29, OUTPUT);
 		digitalWrite(29, LOW);
-		prevModeState = LOW;
+		prevModeState = HIGH;
 		if(errorSet3 == true){
 			//LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 			errorSet3 = false;
