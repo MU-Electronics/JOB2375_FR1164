@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Power-Supply-V2", "Power-Supply-V2.vcxproj", "{6C0DC434-64C6-4824-B9CE-F73C34793595}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JOB2375_FR1164", "JOB2375_FR1164.vcxproj", "{6C0DC434-64C6-4824-B9CE-F73C34793595}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
