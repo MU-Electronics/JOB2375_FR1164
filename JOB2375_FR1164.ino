@@ -112,6 +112,9 @@ void loop()
 
 
 
+
+
+
 /**
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                 DISCLAIMER                  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -139,85 +142,54 @@ bool setupErrors()
 
 bool errors()
 {
+	// Setup pins
+	pinMode(48, INPUT); pinMode(31, OUTPUT); pinMode(50, INPUT); pinMode(46, INPUT); pinMode(44, INPUT); pinMode(29, OUTPUT);
+
 	//Perfrom the power siwtch check
-	pinMode(48, INPUT);
 	if(digitalRead(48) == HIGH)
 	{
-		if((digitalRead(46) == LOW && digitalRead(44) == HIGH ) || (digitalRead(46) == HIGH && digitalRead(44) == LOW )){
-			Serial.println("on");
+		if((digitalRead(46) == LOW && digitalRead(44) == HIGH ) || (digitalRead(46) == HIGH && digitalRead(44) == LOW )){  // Error: Welcoming screen (always HV off)
 			if(errorSet == false){
-				pinMode(31, OUTPUT);
 				digitalWrite(31, LOW);
 				errorSet = true;
 				LcdHandle->errorCondition("Please turn on the HV power to procced", "or select the relivent mode (-/+)", "", "For help contact the electronics section", 1, 1, 1);
 				return false;
 			}
 			errorSet4 = false;
-		}else if(errorSet4 == false){
-			pinMode(31, OUTPUT);
+		}else if(errorSet4 == false){ // Error: plug polarity
 			digitalWrite(31, LOW);
 			errorSet4 = true;
 			errorSet = false;
 			LcdHandle->errorCondition("Please check the plug configuration", "", "", "", 1, 1, 1);
 		}
-	}else if(errorSet == true){
-		pinMode(31, OUTPUT);
+	}else if(errorSet == true && errorSet3 == false){ // Action: clear screen turn HV on
 		digitalWrite(31, HIGH);
 		errorSet = false;
 		LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 		return true;
 	}
 
-	//Perfrom ERROR on mode select when hv on
-	pinMode(50, INPUT);
-	pinMode(48, INPUT);
-	if(digitalRead(48) == LOW && digitalRead(50) != prevModeState){
-		Serial.print(digitalRead(50));
-		Serial.print(" != ");
-		Serial.println(prevModeState);
 
-		if(errorSet2 == false){
-			errorSet2 = true;
-			LcdHandle->errorCondition("Do not change mode with HV on", "", "", "", 1, 1, 1);
-			return false;
-		}
-	}else if(errorSet2 == true && digitalRead(48) == LOW && digitalRead(50) == prevModeState){
-		errorSet2 = false;
-		LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
-		return true;
-	}
-
-	//Perfrom the mode select
-	pinMode(50, INPUT);
-	pinMode(48, INPUT);
-	pinMode(46, INPUT);
-	pinMode(44, INPUT);
-	if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(46) == LOW){ //&& digitalRead(46) == LOW
-		pinMode(29, OUTPUT);
+	if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(46) == LOW){ // Condition: Switch mode
 		digitalWrite(29, HIGH);
 		prevModeState = LOW;
 		if(errorSet3 == true){
-			//LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 			errorSet3 = false;
 			errorSet = false;
 		}
-	}else if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(44) == LOW){ //&& digitalRead(44) == LOW
-		pinMode(29, OUTPUT);
+	}else if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(44) == LOW){ // Condition: Switch mode
 		digitalWrite(29, LOW);
 		prevModeState = HIGH;
 		if(errorSet3 == true){
-			//LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 			errorSet3 = false;
 			errorSet = false;
 		}
-	}else if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(46) == HIGH && digitalRead(44) == LOW){
-		// ERROR PLUG POLATITY
+	}else if(digitalRead(50) == LOW && digitalRead(46) == HIGH && digitalRead(44) == LOW){ // Error: plug polarity
 		if(errorSet3 == false){
 			LcdHandle->errorCondition("Plug wrongs", "", "", "", 1, 1, 1);
 			errorSet3 = true;
 		}
-	}else if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(44) == HIGH && digitalRead(46) == LOW){
-		// ERROR PLUG POLATITY
+	}else if(digitalRead(50) == HIGH && digitalRead(44) == HIGH && digitalRead(46) == LOW){ // Error: plug polarity
 		if(errorSet3 == false){
 			LcdHandle->errorCondition("Plug wrong", "", "", "", 1, 1, 1);
 			errorSet3 = true;
@@ -226,14 +198,22 @@ bool errors()
 		errorSet3 = false;
 	}
 
-	/* Ensure not on when plugs are not in
-	if(digitalRead(46) == HIGH && digitalRead(44) == HIGH){
-		pinMode(31, OUTPUT);
-		digitalWrite(31, LOW);
-		errorSet5 = true;
-		LcdHandle->errorCondition("Please insert rear plugs", "", "", "", 1, 1, 1);
-		Serial.println("off");
-	}*/
+	if(digitalRead(48) == LOW && digitalRead(50) != prevModeState){ // Error: Changing mode when HV on
+		if(errorSet2 == false){
+			errorSet2 = true;
+			LcdHandle->errorCondition("Do not change mode with HV on", "", "", "", 1, 1, 1);
+			return false;
+		}
+	}else if(errorSet2 == true && digitalRead(50) == prevModeState && errorSet3 == false){ // Action: clear screen
+		errorSet2 = false;
+		LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
+		return true;
+	}else if(errorSet2 == true && digitalRead(48) == HIGH){
+		errorSet2 = false;
+		errorSet = true;
+		errorSet3 = false;
+		LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
+	}
 
 	return true;
 }
