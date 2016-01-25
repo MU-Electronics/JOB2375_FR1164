@@ -51,6 +51,8 @@ bool errorSet4 = false;
 bool errorSet5 = false;
 bool errorSet6 = false;
 bool errorSet7 = false;
+bool errorSet8 = false;
+bool errorSet9 = false;
 int prevModeState = 0;
 //ErrorController* ErrorHandler = new ErrorController();
 //std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay()); << This format should be used for the above but ardunio no like atm
@@ -145,7 +147,26 @@ bool errors()
 	// Setup pins
 	pinMode(48, INPUT); pinMode(31, OUTPUT); pinMode(50, INPUT); pinMode(46, INPUT); pinMode(44, INPUT); pinMode(29, OUTPUT);
 
-	//Perfrom the power siwtch check
+	// Check interlock
+	if(digitalRead(52) == HIGH && errorSet8 == false){
+		digitalWrite(31, LOW);
+		LcdHandle->errorCondition("Please check the interlock", "", "", "For help contact the electronics section", 1, 1, 1);
+		errorSet8 = true;
+		return false;
+	}else if(digitalRead(52) == LOW && errorSet8 == true && errorSet9 == false && digitalRead(48) == LOW){
+		errorSet9 = true;
+		errorSet8 = false;
+		LcdHandle->errorCondition("Please turn HV off,", "to comfirm you have check the" , "interlock system.", "For help contact the electronics section", 1, 1, 1);
+		return false;
+	}else if(errorSet9 == true && digitalRead(48) == HIGH){
+		errorSet9 = false;
+	}else if(errorSet8 == true && digitalRead(48) == HIGH && digitalRead(52) == LOW){
+		errorSet8 = false;
+		errorSet = false;
+	}
+
+
+	//Perfrom the power switch check
 	if(digitalRead(48) == HIGH)
 	{
 		if((digitalRead(46) == LOW && digitalRead(44) == HIGH ) || (digitalRead(46) == HIGH && digitalRead(44) == LOW )){  // Error: Welcoming screen (always HV off)
@@ -161,6 +182,7 @@ bool errors()
 			errorSet4 = true;
 			errorSet = false;
 			LcdHandle->errorCondition("Please check the plug configuration", "", "", "", 1, 1, 1);
+			return false;
 		}
 	}else if(errorSet == true && errorSet3 == false){ // Action: clear screen turn HV on
 		digitalWrite(31, HIGH);
