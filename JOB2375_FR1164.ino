@@ -177,12 +177,12 @@ bool errors()
 				return false;
 			}
 			errorSet4 = false;
-		}else if(errorSet4 == false){ // Error: plug polarity
+		}else if(errorSet4 == false){ // Error: No plugs are plugged into the back
 			digitalWrite(31, LOW);
 			errorSet4 = true;
 			errorSet = false;
-			LcdHandle->errorCondition("Please check the plug configuration", "", "", "", 1, 1, 1);
-			return false;
+			LcdHandle->errorCondition("Please ensure etheir the posative or negative", "plug is plugged in, to the rear of the", "power supply to continue.", "", 1, 1, 1);
+			//return false;
 		}
 	}else if(errorSet == true && errorSet3 == false){ // Action: clear screen turn HV on
 		digitalWrite(31, HIGH);
@@ -206,6 +206,13 @@ bool errors()
 			errorSet3 = false;
 			errorSet = false;
 		}
+	}else if(digitalRead(48) == LOW && digitalRead(44) == HIGH && digitalRead(46) == HIGH){ // Error: No plugs are plugged into the back
+		if(errorSet3 == false){
+			LcdHandle->errorCondition("Please ensure ethier the posative or", "negative plug is plugged in, then", "turn the HV supply off and the back on", "to confirm this error", 1, 1, 1);
+			errorSet3 = true;
+		}
+		digitalWrite(31, HIGH);
+		return false;
 	}else if(digitalRead(50) == LOW && digitalRead(46) == HIGH && digitalRead(44) == LOW){ // Error: plug polarity
 		if(errorSet3 == false){
 			LcdHandle->errorCondition("Plug wrongs", "", "", "", 1, 1, 1);
