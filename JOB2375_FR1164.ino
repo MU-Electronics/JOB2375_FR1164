@@ -53,6 +53,7 @@ bool errorSet6 = false;
 bool errorSet7 = false;
 bool errorSet8 = false;
 bool errorSet9 = false;
+bool errorSet10 = false;
 int prevModeState = 0;
 //ErrorController* ErrorHandler = new ErrorController();
 //std::auto_ptr<LcdDisplay> Lcd(new LcdDisplay()); << This format should be used for the above but ardunio no like atm
@@ -134,7 +135,7 @@ bool setupErrors()
 		bool i = false;
 		bool first = true;
 		while(!i){
-			if(first){ LcdHandle->errorCondition("Please place the HV power switch to the", "off postion to proccedd", "", "For help contact the electronics section", 1, 1, 1); first = false; };
+			if(first){ LcdHandle->errorCondition("Please place the HV power switch to the", "off postion to proceed", "", "For help contact the Electronics Section", 1, 1, 1); first = false; };
 			if(digitalRead(48) == HIGH)
 				i = true;
 		}
@@ -157,13 +158,13 @@ bool errors()
 	// Check interlock
 	if(interlockPin == HIGH && errorSet8 == false){
 		digitalWrite(31, LOW);
-		LcdHandle->errorCondition("Please check the interlock", "", "", "For help contact the electronics section", 1, 1, 1);
+		LcdHandle->errorCondition("ERROR: Check system interlock", "", "", "For help contact the Electronics Section", 1, 1, 1);
 		errorSet8 = true;
 		return false;
 	}else if(interlockPin == LOW && errorSet8 == true && errorSet9 == false && hvPin == LOW){
 		errorSet9 = true;
 		errorSet8 = false;
-		LcdHandle->errorCondition("Please turn HV off,", "to comfirm you have check the" , "interlock system.", "For help contact the electronics section", 1, 1, 1);
+		LcdHandle->errorCondition("ERROR: Please turn HV off-on", "to reset the high voltage output" , "", "For help contact the Electronics Section", 1, 1, 1);
 		return false;
 	}else if(errorSet9 == true && hvPin == HIGH){
 		errorSet9 = false;
@@ -181,7 +182,7 @@ bool errors()
 				if(errorSet == false){
 					digitalWrite(31, LOW);
 					errorSet = true;
-					LcdHandle->errorCondition("Please turn on the HV power to procced", "or select the relivent mode (-/+)", "", "For help contact the electronics section", 1, 1, 1);
+					LcdHandle->errorCondition("1. Select the relevant mode (+/-)", "2. Switch HV on", "", "For help contact the Electronics Section", 1, 1, 1);
 					return false;
 				}
 				errorSet4 = false;
@@ -189,7 +190,7 @@ bool errors()
 				digitalWrite(31, LOW);
 				errorSet4 = true;
 				errorSet = false;
-				LcdHandle->errorCondition("Please ensure etheir the posative or negative", "plug is plugged in, to the rear of the", "power supply to continue.", "", 1, 1, 1);
+				LcdHandle->errorCondition("ERROR: Check pos/neg mode plugs are", "connected", "", "For help contact the Electronics Section", 1, 1, 1);
 				//return false;
 			}
 		}else if(errorSet == true && errorSet3 == false){ // Action: clear screen turn HV on
@@ -214,31 +215,39 @@ bool errors()
 				errorSet3 = false;
 				errorSet = false;
 			}
-		}else if(hvPin == LOW && negModePin == HIGH && posModePin == HIGH){ // Error: No plugs are plugged into the back
+		}else if(hvPin == LOW && negModePin == HIGH && posModePin == HIGH && errorSet10 == false){ // Error: No plugs are plugged into the back
 			if(errorSet3 == false){
-				LcdHandle->errorCondition("Please ensure ethier the posative or", "negative plug is plugged in, then", "turn the HV supply off and the back on", "to confirm this error", 1, 1, 1);
+				LcdHandle->errorCondition("ERROR: Check pos/neg mode plugs are", "connected", "", "For help contact the Electronics Section", 1, 1, 1);
 				errorSet3 = true;
 			}
-			digitalWrite(31, HIGH);
+			digitalWrite(31, LOW);
+			return false;
+		}else if(hvPin == LOW && ((posNegPin == HIGH && negModePin == LOW) || (posNegPin == LOW && posModePin == LOW)) && errorSet3 == true){ // Error: Plugs are pluged in but hv need to be turned off
+			if(errorSet10 == false){
+				LcdHandle->errorCondition("ERROR: Please turn HV off-on", "to reset the high voltage output" , "", "For help contact the Electronics Section", 1, 1, 1);
+				errorSet10 = true;
+			}
+			digitalWrite(31, LOW);
 			return false;
 		}else if(posNegPin == LOW && posModePin == HIGH && negModePin == LOW){ // Error: plug polarity
 			if(errorSet3 == false){
-				LcdHandle->errorCondition("Plug wrongs", "", "", "", 1, 1, 1);
+				LcdHandle->errorCondition("ERROR: Incorrect HV mode selected.", "Check rear HV plugs or change mode", "", "For help contact the Electronics Section", 1, 1, 1);
 				errorSet3 = true;
 			}
 		}else if(posNegPin == HIGH && negModePin == HIGH && posModePin == LOW){ // Error: plug polarity
 			if(errorSet3 == false){
-				LcdHandle->errorCondition("Plug wrong", "", "", "", 1, 1, 1);
+				LcdHandle->errorCondition("ERROR: Incorrect HV mode selected.", "Check rear HV plugs or change mode", "", "For help contact the Electronics Section", 1, 1, 1);
 				errorSet3 = true;
 			}
 		}else{
 			errorSet3 = false;
+			errorSet10 = false;
 		}
 
 		if(hvPin == LOW && posNegPin != prevModeState){ // Error: Changing mode when HV on
 			if(errorSet2 == false){
 				errorSet2 = true;
-				LcdHandle->errorCondition("Do not change mode with HV on", "", "", "", 1, 1, 1);
+				LcdHandle->errorCondition("ERROR: Do not change mode with HV on", "", "", "For help contact the Electronics Section", 1, 1, 1);
 				return false;
 			}
 		}else if(errorSet2 == true && posNegPin == prevModeState && errorSet3 == false){ // Action: clear screen

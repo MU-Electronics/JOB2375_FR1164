@@ -96,16 +96,16 @@ namespace LcdConfiguration
 		 std::map< int, String > welcome;
 
 		// Line one
-		welcome[0] = "Electron Gun Supply";
+		 welcome[0] = "Mass Spec Lens Power Supply";
 
 		// Line two
 		welcome[4] = "Setting up system... Please wait";
 
 		// Line three
-		welcome[8] = "School of Chemistry";
+		welcome[8] = "Electronics Section, School of Chemistry";
 
 		// Line four
-		welcome[12] = "Electronics Phone: 0161 275 4641";
+		welcome[12] = "Tel: 0161 275 4641";
 		
 		return welcome;
 	}
