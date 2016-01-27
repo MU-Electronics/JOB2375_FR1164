@@ -145,106 +145,115 @@ bool setupErrors()
 bool errors()
 {
 	// Setup pins
-	pinMode(48, INPUT); pinMode(31, OUTPUT); pinMode(50, INPUT); pinMode(46, INPUT); pinMode(44, INPUT); pinMode(29, OUTPUT);
+	pinMode(48, INPUT); pinMode(31, OUTPUT); pinMode(50, INPUT); pinMode(46, INPUT); pinMode(44, INPUT); pinMode(29, OUTPUT); pinMode(52, INPUT);
+
+	// Take readings from the pins
+	int interlockPin = digitalRead(52); 
+	int hvPin = digitalRead(48);
+	int posNegPin = digitalRead(50);
+	int negModePin = digitalRead(44);
+	int posModePin = digitalRead(46);
 
 	// Check interlock
-	if(digitalRead(52) == HIGH && errorSet8 == false){
+	if(interlockPin == HIGH && errorSet8 == false){
 		digitalWrite(31, LOW);
 		LcdHandle->errorCondition("Please check the interlock", "", "", "For help contact the electronics section", 1, 1, 1);
 		errorSet8 = true;
 		return false;
-	}else if(digitalRead(52) == LOW && errorSet8 == true && errorSet9 == false && digitalRead(48) == LOW){
+	}else if(interlockPin == LOW && errorSet8 == true && errorSet9 == false && hvPin == LOW){
 		errorSet9 = true;
 		errorSet8 = false;
 		LcdHandle->errorCondition("Please turn HV off,", "to comfirm you have check the" , "interlock system.", "For help contact the electronics section", 1, 1, 1);
 		return false;
-	}else if(errorSet9 == true && digitalRead(48) == HIGH){
+	}else if(errorSet9 == true && hvPin == HIGH){
 		errorSet9 = false;
-	}else if(errorSet8 == true && digitalRead(48) == HIGH && digitalRead(52) == LOW){
+	}else if(errorSet8 == true && hvPin == HIGH && interlockPin == LOW){
 		errorSet8 = false;
 		errorSet = false;
 	}
 
 
-	//Perfrom the power switch check
-	if(digitalRead(48) == HIGH)
-	{
-		if((digitalRead(46) == LOW && digitalRead(44) == HIGH ) || (digitalRead(46) == HIGH && digitalRead(44) == LOW )){  // Error: Welcoming screen (always HV off)
-			if(errorSet == false){
+	if(interlockPin == LOW){
+		//Perfrom the power switch check
+		if(hvPin == HIGH)
+		{
+			if((posModePin == LOW && negModePin == HIGH ) || (posModePin == HIGH && negModePin == LOW )){  // Error: Welcoming screen (always HV off)
+				if(errorSet == false){
+					digitalWrite(31, LOW);
+					errorSet = true;
+					LcdHandle->errorCondition("Please turn on the HV power to procced", "or select the relivent mode (-/+)", "", "For help contact the electronics section", 1, 1, 1);
+					return false;
+				}
+				errorSet4 = false;
+			}else if(errorSet4 == false){ // Error: No plugs are plugged into the back
 				digitalWrite(31, LOW);
-				errorSet = true;
-				LcdHandle->errorCondition("Please turn on the HV power to procced", "or select the relivent mode (-/+)", "", "For help contact the electronics section", 1, 1, 1);
+				errorSet4 = true;
+				errorSet = false;
+				LcdHandle->errorCondition("Please ensure etheir the posative or negative", "plug is plugged in, to the rear of the", "power supply to continue.", "", 1, 1, 1);
+				//return false;
+			}
+		}else if(errorSet == true && errorSet3 == false){ // Action: clear screen turn HV on
+			digitalWrite(31, HIGH);
+			errorSet = false;
+			LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
+			return true;
+		}
+
+
+		if(hvPin == HIGH && posNegPin == LOW && posModePin == LOW){ // Condition: Switch mode
+			digitalWrite(29, HIGH);
+			prevModeState = LOW;
+			if(errorSet3 == true){
+				errorSet3 = false;
+				errorSet = false;
+			}
+		}else if(hvPin == HIGH && posNegPin == HIGH && negModePin == LOW){ // Condition: Switch mode
+			digitalWrite(29, LOW);
+			prevModeState = HIGH;
+			if(errorSet3 == true){
+				errorSet3 = false;
+				errorSet = false;
+			}
+		}else if(hvPin == LOW && negModePin == HIGH && posModePin == HIGH){ // Error: No plugs are plugged into the back
+			if(errorSet3 == false){
+				LcdHandle->errorCondition("Please ensure ethier the posative or", "negative plug is plugged in, then", "turn the HV supply off and the back on", "to confirm this error", 1, 1, 1);
+				errorSet3 = true;
+			}
+			digitalWrite(31, HIGH);
+			return false;
+		}else if(posNegPin == LOW && posModePin == HIGH && negModePin == LOW){ // Error: plug polarity
+			if(errorSet3 == false){
+				LcdHandle->errorCondition("Plug wrongs", "", "", "", 1, 1, 1);
+				errorSet3 = true;
+			}
+		}else if(posNegPin == HIGH && negModePin == HIGH && posModePin == LOW){ // Error: plug polarity
+			if(errorSet3 == false){
+				LcdHandle->errorCondition("Plug wrong", "", "", "", 1, 1, 1);
+				errorSet3 = true;
+			}
+		}else{
+			errorSet3 = false;
+		}
+
+		if(hvPin == LOW && posNegPin != prevModeState){ // Error: Changing mode when HV on
+			if(errorSet2 == false){
+				errorSet2 = true;
+				LcdHandle->errorCondition("Do not change mode with HV on", "", "", "", 1, 1, 1);
 				return false;
 			}
-			errorSet4 = false;
-		}else if(errorSet4 == false){ // Error: No plugs are plugged into the back
-			digitalWrite(31, LOW);
-			errorSet4 = true;
-			errorSet = false;
-			LcdHandle->errorCondition("Please ensure etheir the posative or negative", "plug is plugged in, to the rear of the", "power supply to continue.", "", 1, 1, 1);
-			//return false;
+		}else if(errorSet2 == true && posNegPin == prevModeState && errorSet3 == false){ // Action: clear screen
+			errorSet2 = false;
+			LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
+			return true;
+		}else if(errorSet2 == true && hvPin == HIGH){
+			errorSet2 = false;
+			errorSet = true;
+			errorSet3 = false;
+			LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 		}
-	}else if(errorSet == true && errorSet3 == false){ // Action: clear screen turn HV on
-		digitalWrite(31, HIGH);
-		errorSet = false;
-		LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
+	
 		return true;
 	}
-
-
-	if(digitalRead(48) == HIGH && digitalRead(50) == LOW && digitalRead(46) == LOW){ // Condition: Switch mode
-		digitalWrite(29, HIGH);
-		prevModeState = LOW;
-		if(errorSet3 == true){
-			errorSet3 = false;
-			errorSet = false;
-		}
-	}else if(digitalRead(48) == HIGH && digitalRead(50) == HIGH && digitalRead(44) == LOW){ // Condition: Switch mode
-		digitalWrite(29, LOW);
-		prevModeState = HIGH;
-		if(errorSet3 == true){
-			errorSet3 = false;
-			errorSet = false;
-		}
-	}else if(digitalRead(48) == LOW && digitalRead(44) == HIGH && digitalRead(46) == HIGH){ // Error: No plugs are plugged into the back
-		if(errorSet3 == false){
-			LcdHandle->errorCondition("Please ensure ethier the posative or", "negative plug is plugged in, then", "turn the HV supply off and the back on", "to confirm this error", 1, 1, 1);
-			errorSet3 = true;
-		}
-		digitalWrite(31, HIGH);
-		return false;
-	}else if(digitalRead(50) == LOW && digitalRead(46) == HIGH && digitalRead(44) == LOW){ // Error: plug polarity
-		if(errorSet3 == false){
-			LcdHandle->errorCondition("Plug wrongs", "", "", "", 1, 1, 1);
-			errorSet3 = true;
-		}
-	}else if(digitalRead(50) == HIGH && digitalRead(44) == HIGH && digitalRead(46) == LOW){ // Error: plug polarity
-		if(errorSet3 == false){
-			LcdHandle->errorCondition("Plug wrong", "", "", "", 1, 1, 1);
-			errorSet3 = true;
-		}
-	}else{
-		errorSet3 = false;
-	}
-
-	if(digitalRead(48) == LOW && digitalRead(50) != prevModeState){ // Error: Changing mode when HV on
-		if(errorSet2 == false){
-			errorSet2 = true;
-			LcdHandle->errorCondition("Do not change mode with HV on", "", "", "", 1, 1, 1);
-			return false;
-		}
-	}else if(errorSet2 == true && digitalRead(50) == prevModeState && errorSet3 == false){ // Action: clear screen
-		errorSet2 = false;
-		LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
-		return true;
-	}else if(errorSet2 == true && digitalRead(48) == HIGH){
-		errorSet2 = false;
-		errorSet = true;
-		errorSet3 = false;
-		LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
-	}
-
-	return true;
 }
 
 
