@@ -215,6 +215,12 @@ bool errors()
 				errorSet3 = false;
 				errorSet = false;
 			}
+		}else if(hvPin == LOW && posNegPin != prevModeState){ // Error: Changing mode when HV on
+			if(errorSet2 == false){
+				errorSet2 = true;
+				LcdHandle->errorCondition("ERROR: Do not change mode with HV on", "", "", "For help contact the Electronics Section", 1, 1, 1);
+				return false;
+			}
 		}else if(hvPin == LOW && negModePin == HIGH && posModePin == HIGH && errorSet10 == false){ // Error: No plugs are plugged into the back
 			if(errorSet3 == false){
 				LcdHandle->errorCondition("ERROR: Check pos/neg mode plugs are", "connected", "", "For help contact the Electronics Section", 1, 1, 1);
@@ -244,13 +250,10 @@ bool errors()
 			errorSet10 = false;
 		}
 
-		if(hvPin == LOW && posNegPin != prevModeState){ // Error: Changing mode when HV on
-			if(errorSet2 == false){
-				errorSet2 = true;
-				LcdHandle->errorCondition("ERROR: Do not change mode with HV on", "", "", "For help contact the Electronics Section", 1, 1, 1);
-				return false;
-			}
-		}else if(errorSet2 == true && posNegPin == prevModeState && errorSet3 == false){ // Action: clear screen
+
+
+		// Clear error messages
+		if(errorSet2 == true && posNegPin == prevModeState && errorSet3 == false){ // Action: clear screen
 			errorSet2 = false;
 			LcdHandle->errorCondition("", "", "", "", 0, 0, 0);
 			return true;
