@@ -83,7 +83,7 @@ namespace LcdConfiguration
 	 */
 	static int refreshRate()
 	{
-		return 200;
+		return 50;
 	}
 
 

@@ -116,7 +116,7 @@ namespace VoltageConfiguration
 	 */
 	static int setupMovingAverage(  )
 	{
-		return 3;
+		return 2;
 	}
 
 
