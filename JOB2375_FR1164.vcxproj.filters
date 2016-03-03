@@ -73,6 +73,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Power-Supply-V2.ino" />
+    <None Include="JOB2375_FR1164.ino" />
   </ItemGroup>
 </Project>

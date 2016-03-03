@@ -136,10 +136,18 @@ int LcdController::update(int channel, int type, int id, bool forcefull)
 	//If voltage has chnaged update
 	if(difference > voltagesJitter[types][channel] || lastUpdated[types].find(channel)  == lastUpdated[types].end() || forcefull == true)
 	{
-		// Create channel with values		
-		Lcd->show("V"+this->numberToLetter(id+1)+":"+voltage+"v ", id);
-		// Update last value
-		lastUpdated[types][channel] = v;
+		// Check length of string @todo make this dynamic
+		if(voltage.length() < 8){
+			//::Serial.println("V"+this->numberToLetter(id+1)+":"+voltage+"v ");
+			// Create channel with values		
+			Lcd->show("V"+this->numberToLetter(id+1)+":"+voltage+"v ", id);
+			// Update last value
+			lastUpdated[types][channel] = v;
+		}else{
+			::Serial.print("ERROR: voltage string is too long: ");
+			::Serial.println(voltage);
+		}
+		
 	}
 }
 

@@ -18,6 +18,7 @@ class VoltageMeasure
 		float average(int channel, int type, int value);
 		float digitalToVoltage(int channel, int type, int value);
 		float acquire(int channel, int type);
+		bool validateVoltage(int voltage);
 		std::map< int, std::map< int, std::map<int, float> > > channel_container;
 		std::map<int, float> voltages_internal; 
 		std::map<int, float> voltages_external;

@@ -11,6 +11,10 @@
 #include "VoltageConfiguration.cpp"
 #include <iterator>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
 
 /**
  * Setup class
@@ -83,7 +87,16 @@ VoltageMeasure::~VoltageMeasure(void)
 float VoltageMeasure::acquire(int channel, int type)
 {
 	//Get the average voltage
-	float voltage = (type == 1)? this->average(channel, 2, this->external(channel)) : this->average(channel, 1,  this->internal(channel));
+	float voltage = 0;
+	if(type == 1){
+		int voltageRead = this->external(channel);
+		if(this->validateVoltage(voltageRead))
+			voltage = this->average(channel, 2, voltageRead);
+	}else{ 
+		int voltageRead = this->internal(channel);
+		if(this->validateVoltage(voltageRead))
+			voltage = this->average(channel, 1,  voltageRead);
+	}
 
 	//We'll change to interger for now
 	return voltage;
@@ -196,6 +209,25 @@ int VoltageMeasure::external(int channel)
 
 	//Return value
 	return adcvalue;
+}
+
+/**
+ * PRIVATE Validate a voltage that has been read
+ * @author Sam Mottley sam.mottley@manchester.ac.uk
+ *
+ * @pram voltage, The voltage to be validated 
+ */
+bool VoltageMeasure::validateVoltage(int voltage)
+{
+
+	//regex regex_pattern("-?[0-9]+.?[0-9]+");
+	if ((voltage >= 0) && (voltage <= 4096)) //&& (voltage >= 0) && (voltage <= 4096)
+		return true;
+	
+	::Serial.print("ERROR: Read voltage is not a int: ");
+	::Serial.println(voltage);
+
+	return false;
 }
 
 

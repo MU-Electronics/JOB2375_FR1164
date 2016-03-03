@@ -43,7 +43,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\mega;C:\Users\electronics\Documents\Arduino\Power-Supply-V2;C:\Program Files (x86)\Arduino\libraries\LiquidCrystal\src;C:\Program Files (x86)\Arduino\libraries\LiquidCrystal\src\utility;C:\Users\electronics\Documents\Arduino\libraries\StandardCplusplus;C:\Users\electronics\Documents\Arduino\libraries\StandardCplusplus\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\1r4u4aca.h5n\Micro Platforms\default\debuggers;C:\Users\electronics\Documents\Arduino\libraries;C:\Users\electronics\Documents\Arduino\Power-Supply-V2;C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\mega;C:\Program Files (x86)\Arduino\libraries\LiquidCrystal\src;C:\Users\electronics\Documents\Arduino\libraries\StandardCplusplus;C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\1r4u4aca.h5n\Micro Platforms\default\debuggers\VM_DBG;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\1r4u4aca.h5n\Micro Platforms\default\debuggers;C:\Users\electronics\Documents\Arduino\libraries;{runtime.tools.avr-gcc.path}/avr/include/;{runtime.tools.avr-gcc.path}//avr/include/avr/;{runtime.tools.avr-gcc.path}/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\mega;C:\development\cpp\JOB2375_FR1164;C:\Program Files (x86)\Arduino\libraries\LiquidCrystal\src;C:\Program Files (x86)\Arduino\libraries\LiquidCrystal\src\utility;C:\Users\electronics\Documents\Arduino\libraries\StandardCplusplus;C:\Users\electronics\Documents\Arduino\libraries\StandardCplusplus\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\1r4u4aca.h5n\Micro Platforms\default\debuggers;C:\Users\electronics\Documents\Arduino\libraries;{runtime.tools.avr-gcc.path}/avr/include/;{runtime.tools.avr-gcc.path}//avr/include/avr/;{runtime.tools.avr-gcc.path}/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>C:\Users\electronics\Documents\Arduino\Power-Supply-V2\__vm\.Power-Supply-V2.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega2560__;_VMDEBUG=1;F_CPU=16000000L;ARDUINO=10601;ARDUINO_AVR_MEGA2560;ARDUINO_ARCH_AVR;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -66,7 +66,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="Power-Supply-V2.ino">
+    <None Include="JOB2375_FR1164.ino">
       <FileType>CppCode</FileType>
     </None>
   </ItemGroup>

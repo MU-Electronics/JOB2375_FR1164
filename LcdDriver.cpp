@@ -112,6 +112,7 @@ bool LcdDriver::print(String string, int block)
 		// If block less than 10 clear blocks previous content
 		if(string.length() < 10) { this->clearBlock(block); }
 		// Printing to LCD 1
+		::Serial.println(string);
 		this->lcd[1]->print(string);
 	}
 	else
@@ -119,6 +120,7 @@ bool LcdDriver::print(String string, int block)
 		// If block less than 10 clear blocks previous content
 		if(string.length() < 10) { this->clearBlock(block); }
 		// Printing to LCD 2
+		::Serial.println(string);
 		this->lcd[2]->print(string);
 	}
 
@@ -217,6 +219,28 @@ bool LcdDriver::clearAll()
 	// Clear display
 	this->lcd[1]->clear();
 	this->lcd[2]->clear();
+
+	this->lcd[1]->home();
+	this->lcd[2]->home();
+
+	this->lcd[1]->noBlink();
+	this->lcd[2]->noBlink();
+
+	this->lcd[1]->noCursor();
+	this->lcd[2]->noCursor();
+
+	// Clear display
+	this->lcd[1]->clear();
+	this->lcd[2]->clear();
+
+	this->lcd[1]->home();
+	this->lcd[2]->home();
+
+	this->lcd[1]->noBlink();
+	this->lcd[2]->noBlink();
+
+	this->lcd[1]->noCursor();
+	this->lcd[2]->noCursor();
 
 	return true;
 }

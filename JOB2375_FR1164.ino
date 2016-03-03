@@ -36,7 +36,7 @@ std::map< String, std::map<int, int> > setupVoltagesAccurcy = VoltageConfigurati
 
 
 /**
- * Init classes
+ * Init classes and vars
  * @author Sam Mottley sam.mottley@manchester.ac.uk
  * @note The below should really be contained with an container
  */
@@ -135,7 +135,7 @@ bool setupErrors()
 		bool i = false;
 		bool first = true;
 		while(!i){
-			if(first){ LcdHandle->errorCondition("Please place the HV power switch to the", "off postion to proceed", "", "For help contact the Electronics Section", 1, 1, 1); first = false; };
+			if(first){ LcdHandle->errorCondition("Please place the HV on switch to the", "off postion to proceed", "", "For help contact the Electronics Section", 1, 1, 1); first = false; };
 			if(digitalRead(48) == HIGH)
 				i = true;
 		}

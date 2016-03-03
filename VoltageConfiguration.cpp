@@ -41,18 +41,18 @@ namespace VoltageConfiguration
 		std::map< String, std::map<int, float> > voltage_config_container;
 
 		//Set channel with their voltages
-		voltage_config_container["INTERNAL"][0] = 100;
-		voltage_config_container["INTERNAL"][1] = 100;
-		voltage_config_container["INTERNAL"][2] = 100;
-		voltage_config_container["INTERNAL"][3] = 100;
-		voltage_config_container["EXTERNAL"][0] = 100;
-		voltage_config_container["EXTERNAL"][1] = 100;
-		voltage_config_container["EXTERNAL"][2] = 100;
+		voltage_config_container["INTERNAL"][0] = 200;
+		voltage_config_container["INTERNAL"][1] = 200;
+		voltage_config_container["INTERNAL"][2] = 200;
+		voltage_config_container["INTERNAL"][3] = 200;
+		voltage_config_container["EXTERNAL"][0] = 40;
+		voltage_config_container["EXTERNAL"][1] = 200;
+		voltage_config_container["EXTERNAL"][2] = 700;
 		voltage_config_container["EXTERNAL"][3] = 100;
 		voltage_config_container["EXTERNAL"][4] = 100;
 		voltage_config_container["EXTERNAL"][5] = 100;
-		voltage_config_container["EXTERNAL"][6] = 100;
-		voltage_config_container["EXTERNAL"][7] = 100;
+		voltage_config_container["EXTERNAL"][6] = 200;
+		voltage_config_container["EXTERNAL"][7] = 200;
 
 		return voltage_config_container;
 	}
