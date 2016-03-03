@@ -88,6 +88,28 @@ namespace LcdConfiguration
 
 
 	/**
+	 * Which pin to check the power supply level
+	 *
+	 * This is required to ensure the lcd is not wrote to when there is a supply blip (EMI).
+	 */
+	static int supplyCheck()
+	{
+		return 4;
+	}
+
+
+	/**
+	 * Voltage level at which the lcd can be wrote at
+	 *
+	 * Bare in mind that the voltage level is being read by a 10 bit ADC
+	 */
+	static int supplyCheckLevel()
+	{
+		return 1020;
+	}
+	
+
+	/**
 	 * Information to show on the welcome screen on boot
 	 */
 	static std::map< int, String > welcome()

@@ -140,13 +140,17 @@ float VoltageMeasure::average(int channel, int type, int value)
 float VoltageMeasure::digitalToVoltage(int channel, int type, int value)
 {
 	float stepSize;
+	float toreturn;
 	if(type == 2){
 		stepSize = voltages_external[channel] / EXTERNAL_ADC_BIT_SIZE;
+		toreturn = stepSize * value;
 	}else{
 		stepSize =  voltages_internal[channel] / INTERNAL_ADC_BIT_SIZE;
+		// apply some scaling (Arduino 5V ref and high voltage boards 4.096 ref)
+		toreturn = (stepSize * value) * 1.220703125;
 	}
 	
-	return stepSize * value;
+	return toreturn;
 }
 
 /**
@@ -157,6 +161,7 @@ float VoltageMeasure::digitalToVoltage(int channel, int type, int value)
  */
 int VoltageMeasure::internal(int channel)
 {
+	// Read the value
 	return ::analogRead(channel);
 }
 

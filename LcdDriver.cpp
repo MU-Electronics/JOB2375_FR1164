@@ -22,7 +22,7 @@ LcdDriver::LcdDriver(void)
 	// Get Lcd setup data from configuration file
 	lcdSetup = LcdConfiguration::setupLcdDisplay();
 
-	//Setup Lcds
+	// Setup Lcds
 	std::vector< int > LcdOne = lcdSetup[0];
 	std::vector< int > LcdTwo = lcdSetup[1];
 	lcd[1] = new LiquidCrystal(LcdOne[0], LcdOne[1], LcdOne[2], LcdOne[3], LcdOne[4], LcdOne[5]);
@@ -32,14 +32,20 @@ LcdDriver::LcdDriver(void)
 	lcd[1]->begin(lcdSetup[2][0], lcdSetup[2][1]);
     lcd[2]->begin(lcdSetup[2][0], lcdSetup[2][1]);
 
-	//Set LCD ids for blocks
+	// Set LCD ids for blocks
 	this->BLOCK_LCD_IDS = lcdSetup[3];
 
-	//Set LCD row for blocks
+	// Set LCD row for blocks
 	this->BLOCK_ROWS = lcdSetup[4];
 
-	//Set LCD col for blocks
+	// Set LCD col for blocks
 	this->BLOCK_COLS = lcdSetup[5];
+
+	// voltage check port
+	voltageCheckPort = LcdConfiguration::supplyCheck();
+
+	// Allowed voltage level
+	voltageCheckLevel = LcdConfiguration::supplyCheckLevel();
 }
 
 
@@ -107,25 +113,34 @@ bool LcdDriver::setBlock(int block)
  */
 bool LcdDriver::print(String string, int block)
 {
-	// Print string to LCD
-	if(block <= 7) {
-		// If block less than 10 clear blocks previous content
-		if(string.length() < 10) { this->clearBlock(block); }
-		// Printing to LCD 1
-		::Serial.println(string);
-		this->lcd[1]->print(string);
-	}
-	else
-	{
-		// If block less than 10 clear blocks previous content
-		if(string.length() < 10) { this->clearBlock(block); }
-		// Printing to LCD 2
-		::Serial.println(string);
-		this->lcd[2]->print(string);
+	// Check the voltage level
+	int level = ::analogRead(voltageCheckPort);
+	if(level > voltageCheckLevel){
+		// Print string to LCD
+		if(block <= 7) {
+			// If block less than 10 clear blocks previous content
+			if(string.length() < 10) { this->clearBlock(block); }
+			// Printing to LCD 1
+			this->lcd[1]->print(string);
+		}
+		else
+		{
+			// If block less than 10 clear blocks previous content
+			if(string.length() < 10) { this->clearBlock(block); }
+			// Printing to LCD 2
+			this->lcd[2]->print(string);
+		}
+
+		//Task completed
+		return true;
 	}
 
-	//Task completed
-	return true;
+	// Print error to serial to ensure capture
+	::Serial.print("ERROR: VCC was not high enough to write to the lcd display; "); ::Serial.print(level); ::Serial.println(" out of 1024 is not within the accepted range.");
+
+	// Return task failed
+	return false;
+	
 }
 
 

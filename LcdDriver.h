@@ -25,6 +25,8 @@ class LcdDriver
 		bool setBlock(int block);
 		bool print(String string, int block);
 		std::vector< std::vector< int > > lcdSetup;
+		int voltageCheckPort;
+		int voltageCheckLevel;
 	public:
 		std::vector< int > BLOCK_LCD_IDS;
 		std::vector< int > BLOCK_ROWS;
